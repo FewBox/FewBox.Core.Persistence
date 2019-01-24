@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Security.Claims;
 using FewBox.Core.Persistence.Cache;
 using FewBox.Core.Persistence.Orm;
@@ -18,8 +19,18 @@ namespace FewBox.Core.Persistence.UnitTest
         [TestInitialize]
         public void Init()
         {
+            string fileName = Environment.GetEnvironmentVariable("SQLITEFILENAME");
+            if(String.IsNullOrEmpty(fileName))
+            {
+                fileName = "FewBox.sqlite";
+            }
+            string filePath = $"{Environment.CurrentDirectory}\\{fileName}";
+            if(!File.Exists(filePath))
+            {
+                throw new Exception($"The SQLite file '{filePath}' is not exists!");
+            }
             var ormConfigurationMock = new Mock<IOrmConfiguration>();
-            ormConfigurationMock.Setup(x => x.GetConnectionString()).Returns($"Data Source={Environment.CurrentDirectory}\\FewBox.sqlite"); //Server=localhost;Database=fewbox;Uid=fewbox;Pwd=fewbox;SslMode=REQUIRED;Charset=utf8;ConnectionTimeout=60;DefaultCommandTimeout=60;
+            ormConfigurationMock.Setup(x => x.GetConnectionString()).Returns($"Data Source={filePath}"); //Server=localhost;Database=fewbox;Uid=fewbox;Pwd=fewbox;SslMode=REQUIRED;Charset=utf8;ConnectionTimeout=60;DefaultCommandTimeout=60;
             var tokenServiceMock = new Mock<ITokenService>();
             tokenServiceMock.Setup(x => x.GenerateToken(It.IsAny<UserInfo>(), TimeSpan.MaxValue)).Returns("");
             var currentUserMock = new Mock<ICurrentUser<string>>();
