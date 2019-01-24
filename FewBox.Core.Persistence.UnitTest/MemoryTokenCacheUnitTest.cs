@@ -10,20 +10,20 @@ namespace FewBox.Core.Persistence.UnitTest
     public class MemoryTokenCacheUnitTest
     {
         private ITokenService TokenService { get; set; }
-        private CurrentUser CurrentUser { get; set; }
+        private UserInfo UserInfo { get; set; }
 
         [TestInitialize]
         public void Init()
         {
             this.TokenService = new MemoryTokenCache(new MemoryCache(new MemoryCacheOptions{})); // MVC: services.AddMemoryCache();
-            this.CurrentUser = new CurrentUser { Id = Guid.NewGuid().ToString() };
+            this.UserInfo = new UserInfo { Id = Guid.NewGuid().ToString() };
         }
 
         [TestMethod]
         public void TestToken()
         {
-            string token = this.TokenService.GenerateToken(this.CurrentUser, TimeSpan.FromMinutes(5));
-            Assert.AreEqual(this.CurrentUser.Id, this.TokenService.GetUserIdByToken(token));
+            string token = this.TokenService.GenerateToken(this.UserInfo, TimeSpan.FromMinutes(5));
+            Assert.AreEqual(this.UserInfo.Id, this.TokenService.GetUserIdByToken(token));
         }
     }
 }

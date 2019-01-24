@@ -13,10 +13,10 @@ namespace FewBox.Core.Persistence.Cache
             this.MemoryCache = memoryCache;
         }
 
-        public string GenerateToken(CurrentUser currentUser, TimeSpan expiredTime)
+        public string GenerateToken(UserInfo userInfo, TimeSpan expiredTime)
         {
             string token = Guid.NewGuid().ToString();
-            this.MemoryCache.Set<string>(token, currentUser.Id, expiredTime);
+            this.MemoryCache.Set<string>(token, userInfo.Id.ToString(), expiredTime);
             return token;
         }
 

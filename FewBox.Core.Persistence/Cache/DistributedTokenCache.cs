@@ -14,14 +14,14 @@ namespace FewBox.Core.Persistence.Cache
             this.DistributedCache = distributedCache;
         }
 
-        public string GenerateToken(CurrentUser currentUser, TimeSpan expiredTime)
+        public string GenerateToken(UserInfo userInfo, TimeSpan expiredTime)
         {
             string token = Guid.NewGuid().ToString();
             DistributedCacheEntryOptions distributedCacheEntryOptions = new DistributedCacheEntryOptions
             {
                 AbsoluteExpirationRelativeToNow = expiredTime
             };
-            this.DistributedCache.SetString(token.ToString(), currentUser.Id.ToString(), distributedCacheEntryOptions);
+            this.DistributedCache.SetString(token.ToString(), userInfo.Id.ToString(), distributedCacheEntryOptions);
             return token;
         }
 

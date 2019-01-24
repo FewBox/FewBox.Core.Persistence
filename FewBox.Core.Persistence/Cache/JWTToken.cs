@@ -12,14 +12,14 @@ namespace FewBox.Core.Persistence.Cache
 {
     public class JWTToken : ITokenService
     {
-        public string GenerateToken(CurrentUser currentUser, TimeSpan expiredTime)
+        public string GenerateToken(UserInfo userInfo, TimeSpan expiredTime)
         {
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(currentUser.Key));
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(userInfo.Key));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
             var token = new JwtSecurityToken(
-                currentUser.Issuer,
-                currentUser.Issuer,
-                currentUser.Claims.Union( new List<Claim>{ new Claim("Id", currentUser.Id, ClaimTypes.NameIdentifier)} ),
+                userInfo.Issuer,
+                userInfo.Issuer,
+                userInfo.Claims.Union( new List<Claim>{ new Claim("Id", userInfo.Id.ToString(), ClaimTypes.NameIdentifier)} ),
                 expires: DateTime.Now.AddTicks(expiredTime.Ticks),
                 signingCredentials: creds);
             return new JwtSecurityTokenHandler().WriteToken(token);

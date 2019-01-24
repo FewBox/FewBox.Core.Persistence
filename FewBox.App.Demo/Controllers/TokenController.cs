@@ -31,13 +31,13 @@ namespace FewBox.App.Demo.Controllers
         {
             if(signInRequestDto.Username=="landpy" && signInRequestDto.Password=="fewbox")
             {
-                var currentUser = new CurrentUser { 
+                var userInfo = new UserInfo { 
                     Id = Guid.NewGuid().ToString(),
                     Key = this.JWTConfig.Key,
                     Issuer = this.JWTConfig.Issuer,
                     Claims = new List<Claim>{  }
                 };
-                string token = this.TokenService.GenerateToken(currentUser, TimeSpan.FromMinutes(5));
+                string token = this.TokenService.GenerateToken(userInfo, TimeSpan.FromMinutes(5));
                 return new SignInResponseDto { IsValid = true, Token = token };
             }
             else

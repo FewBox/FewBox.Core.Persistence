@@ -1,31 +1,35 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Dapper;
+using Microsoft.AspNetCore.Http;
 
 namespace FewBox.Core.Persistence.Orm
 {
-    public abstract class BaseRepository<TEntity> : IBaseRepository<TEntity> where TEntity: Entity
+    public abstract class BaseRepository<TEntity, TID> : IBaseRepository<TEntity, TID> where TEntity: Entity<TID>
     {
         protected string TableName { get; set; }
         protected IUnitOfWork UnitOfWork { get; set; }
+        protected ICurrentUser<TID> CurrentUser { get; set; }
 
-        protected BaseRepository(string tableName, IDapperSession dapperSession)
+        protected BaseRepository(string tableName, IOrmSession dapperSession, ICurrentUser<TID> currentUser)
         {
             this.TableName = tableName;
             this.UnitOfWork = dapperSession.UnitOfWork;
+            this.CurrentUser = currentUser;
         }
 
         public int BatchSave(IEnumerable<TEntity> entities)
         {
-            this.BatchInitSaveDefaultProperty(entities, this.UnitOfWork.CurrentUser.Id);
+            this.BatchInitSaveDefaultProperty(entities);
             return this.UnitOfWork.Connection.Execute(this.GetSaveSql(), entities);
         }
 
         public Task<int> BatchSaveAsync(IEnumerable<TEntity> entities)
         {
-            this.BatchInitSaveDefaultProperty(entities, this.UnitOfWork.CurrentUser.Id);
+            this.BatchInitSaveDefaultProperty(entities);
             return this.UnitOfWork.Connection.ExecuteAsync(this.GetSaveSql(), entities);
         }
 
@@ -39,30 +43,30 @@ namespace FewBox.Core.Persistence.Orm
             return this.UnitOfWork.Connection.ExecuteScalarAsync<int>(String.Format(@"select count(1) from {0}", this.TableName));
         }
 
-        public int Recycle(Guid id)
+        public int Recycle(TID id)
         {
             this.UnitOfWork.Connection.Execute(String.Format(@"insert into {0}_recycle select * from {1} where Id=@id", this.TableName.Trim('`'), this.TableName), new { id });
             this.UnitOfWork.Connection.Execute(String.Format(@"update {0}_recycle set ModifiedBy=@ModifiedBy,ModifiedTime=@ModifiedTime where Id=@id", this.TableName.Trim('`')),
-                new { id, ModifiedTime = DateTime.UtcNow, ModifiedBy = this.UnitOfWork.CurrentUser.Id });
+                new { id, ModifiedTime = DateTime.UtcNow, ModifiedBy = this.CurrentUser.GetId() });
             return this.UnitOfWork.Connection.Execute(String.Format(@"delete from {0} where Id=@id", this.TableName), new { id });
 
         }
 
-        public Task<int> RecycleAsync(Guid id)
+        public Task<int> RecycleAsync(TID id)
         {
             this.UnitOfWork.Connection.ExecuteAsync(String.Format(@"insert into {0}_recycle select * from {1} where Id=@id", this.TableName.Trim('`'), this.TableName), new { id });
             this.UnitOfWork.Connection.ExecuteAsync(String.Format(@"update {0}_recycle set ModifiedBy=@ModifiedBy,ModifiedTime=@ModifiedTime where Id=@id", this.TableName.Trim('`')),
-                new { id, ModifiedTime = DateTime.UtcNow, ModifiedBy = this.UnitOfWork.CurrentUser.Id });
+                new { id, ModifiedTime = DateTime.UtcNow, ModifiedBy = this.CurrentUser.GetId() });
             return this.UnitOfWork.Connection.ExecuteAsync(String.Format(@"delete from {0} where Id=@id", this.TableName), new { id });
         }
 
-        public int Delete(Guid id)
+        public int Delete(TID id)
         {
             return this.UnitOfWork.Connection.Execute(String.Format(@"delete from {0} where Id=@id", this.TableName), new { id });
 
         }
 
-        public Task<int> DeleteAsync(Guid id)
+        public Task<int> DeleteAsync(TID id)
         {
             return this.UnitOfWork.Connection.ExecuteAsync(String.Format(@"delete from {0} where Id=@id", this.TableName), new { id });
         }
@@ -89,134 +93,131 @@ namespace FewBox.Core.Persistence.Orm
             return this.UnitOfWork.Connection.QueryAsync<TEntity>(String.Format(@"select * from {0} limit @From,@PageRange", this.TableName), new { From = from, PageRange = pageRange });
         }
 
-        public TEntity FindOne(Guid id)
+        public TEntity FindOne(TID id)
         {
             return this.UnitOfWork.Connection.QuerySingleOrDefault<TEntity>(String.Format(@"select * from {0} where Id=@id", this.TableName), new { id });
         }
 
-        public Task<TEntity> FindOneAsync(Guid id)
+        public Task<TEntity> FindOneAsync(TID id)
         {
             return this.UnitOfWork.Connection.QuerySingleOrDefaultAsync<TEntity>(String.Format(@"select * from {0} where Id=@id", this.TableName), new { id });
         }
 
-        public bool IsExist(Guid id)
+        public bool IsExist(TID id)
         {
             return this.UnitOfWork.Connection.ExecuteScalar<int>(String.Format("select count(1) from {0} where Id=@id", this.TableName), new { id }) > 0;
         }
 
-        public Task<bool> IsExistAsync(Guid id)
+        public Task<bool> IsExistAsync(TID id)
         {
             Task<int> task = this.UnitOfWork.Connection.ExecuteScalarAsync<int>(String.Format("select count(1) from {0} where Id=@id", TableName), new { id });
             return task.ContinueWith<bool>((t) => { return t.Result > 1; });
 
         }
 
-        public Guid Save(TEntity entity)
+        public TID Save(TEntity entity)
         {
-            this.InitCreatedAndModified(entity, this.UnitOfWork.CurrentUser.Id);
-            if (entity.Id == Guid.Empty)
-            {
-                entity.Id = Guid.NewGuid();
-            }
+            this.InitSaveDefaultProperty(entity);
             this.UnitOfWork.Connection.Execute(this.GetSaveSql(), entity);
             return entity.Id;
         }
 
         public Task<int> SaveAsync(TEntity entity)
         {
-            this.InitCreatedAndModified(entity, this.UnitOfWork.CurrentUser.Id);
-            if (entity.Id == Guid.Empty)
+            this.InitSaveDefaultProperty(entity);
+            if (entity.Id == null)
             {
-                entity.Id = Guid.NewGuid();
+                entity.Id = default(TID);
             }
             return this.UnitOfWork.Connection.ExecuteAsync(this.GetSaveSql(), entity);
         }
 
         public int Update(TEntity entity)
         {
-            this.InitUpdateDefaultProperty(entity, this.UnitOfWork.CurrentUser.Id);
+            this.InitUpdateDefaultProperty(entity);
             return this.UnitOfWork.Connection.Execute(this.GetUpdateSql(), entity);
 
         }
 
         public Task<int> UpdateAsync(TEntity entity)
         {
-            this.InitUpdateDefaultProperty(entity, this.UnitOfWork.CurrentUser.Id);
+            this.InitUpdateDefaultProperty(entity);
             return this.UnitOfWork.Connection.ExecuteAsync(this.GetUpdateSql(), entity);
 
         }
 
-        protected void InitCreatedAndModified(Entity entity, string currentUserId)
+        protected void InitSaveDefaultProperty(TEntity entity)
         {
+            entity.Id = this.GenerateNewId();
             entity.ModifiedTime = entity.CreatedTime = DateTime.UtcNow;
-            if (String.IsNullOrEmpty(entity.CreatedBy))
-            {
-                entity.CreatedBy = currentUserId;
-            }
-            if (String.IsNullOrEmpty(entity.ModifiedBy))
-            {
-                entity.ModifiedBy = currentUserId;
-            }
+            entity.CreatedBy = this.CurrentUser.GetId();
+            entity.ModifiedBy = this.CurrentUser.GetId();
         }
 
-        protected void BatchInitSaveDefaultProperty(IEnumerable<TEntity> entitys, string currentUserId)
+        private TID GenerateNewId()
+        {
+            TID id = (TID)Convert.ChangeType(Guid.NewGuid().ToString(), typeof(TID));
+            return id;
+        }
+
+        protected void InitUpdateDefaultProperty(TEntity entity)
+        {
+            entity.ModifiedTime = DateTime.UtcNow;
+            entity.ModifiedBy = this.CurrentUser.GetId();
+        }
+
+        protected void BatchInitSaveDefaultProperty(IEnumerable<TEntity> entitys)
         {
             foreach (var entity in entitys)
             {
                 entity.ModifiedTime = entity.CreatedTime = DateTime.UtcNow;
-                entity.ModifiedBy = entity.CreatedBy = currentUserId;
+                entity.ModifiedBy = entity.CreatedBy = this.CurrentUser.GetId();
             }
         }
 
-        protected void BatchInitUpdateDefaultProperty(IEnumerable<TEntity> entitys, string currentUserId)
+        protected void BatchInitUpdateDefaultProperty(IEnumerable<TEntity> entitys)
         {
             foreach (var entity in entitys)
             {
                 entity.ModifiedTime = entity.CreatedTime = DateTime.UtcNow;
-                entity.ModifiedBy = entity.CreatedBy = currentUserId;
+                entity.ModifiedBy = entity.CreatedBy = this.CurrentUser.GetId();
             }
         }
 
         public Task<int> ReplaceAsync(TEntity entity)
         {
-            this.InitCreatedAndModified(entity, this.UnitOfWork.CurrentUser.Id);
+            this.InitSaveDefaultProperty(entity);
             return this.UnitOfWork.Connection.ExecuteAsync(this.GetReplaceSql(), entity);
         }
 
         public Task<int> BatchReplaceAsync(IEnumerable<TEntity> entities)
         {
-            this.BatchInitSaveDefaultProperty(entities, this.UnitOfWork.CurrentUser.Id);
+            this.BatchInitSaveDefaultProperty(entities);
             return this.UnitOfWork.Connection.ExecuteAsync(this.GetReplaceSql(), entities);
         }
 
         public Task<int> BatchUpdateByUniqueKeyAsync(IEnumerable<TEntity> entities)
         {
-            this.BatchInitUpdateDefaultProperty(entities, this.UnitOfWork.CurrentUser.Id);
+            this.BatchInitUpdateDefaultProperty(entities);
             return this.UnitOfWork.Connection.ExecuteAsync(this.GetUpdateSqlWithUniqueKey(), entities);
         }
 
         public int Replace(TEntity entity)
         {
-            this.InitCreatedAndModified(entity, this.UnitOfWork.CurrentUser.Id);
+            this.InitSaveDefaultProperty(entity);
             return this.UnitOfWork.Connection.Execute(this.GetReplaceSql(), entity);
         }
 
         public int BatchReplace(IEnumerable<TEntity> entities)
         {
-            this.BatchInitSaveDefaultProperty(entities, this.UnitOfWork.CurrentUser.Id);
+            this.BatchInitSaveDefaultProperty(entities);
             return this.UnitOfWork.Connection.Execute(this.GetReplaceSql(), entities);
         }
 
         public int BatchUpdateByUniqueKey(IEnumerable<TEntity> entities)
         {
-            this.BatchInitUpdateDefaultProperty(entities, this.UnitOfWork.CurrentUser.Id);
+            this.BatchInitUpdateDefaultProperty(entities);
             return this.UnitOfWork.Connection.Execute(this.GetUpdateSqlWithUniqueKey(), entities);
-        }
-
-        protected void InitUpdateDefaultProperty(Entity entity, string currentUserId)
-        {
-            entity.ModifiedTime = DateTime.UtcNow;
-            entity.ModifiedBy = currentUserId;
         }
 
         private string GetSaveSql()

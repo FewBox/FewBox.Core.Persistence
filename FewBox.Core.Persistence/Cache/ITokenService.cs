@@ -5,7 +5,7 @@ namespace FewBox.Core.Persistence.Cache
 {
     public interface ITokenService
     {
-        string GenerateToken(CurrentUser currentUser, TimeSpan expiredTime);
+        string GenerateToken(UserInfo userInfo, TimeSpan expiredTime);
         string GetUserIdByToken(string token);
     }
 }

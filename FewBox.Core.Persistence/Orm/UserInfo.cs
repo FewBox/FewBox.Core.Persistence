@@ -4,9 +4,9 @@ using System.Security.Claims;
 
 namespace FewBox.Core.Persistence.Orm
 {
-    public struct CurrentUser
+    public struct UserInfo
     {
-        public string Id { get; set; }
+        public object Id { get; set; }
         // JWT
         public string Key{ get; set; }
         public string Issuer { get; set; }

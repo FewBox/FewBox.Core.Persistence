@@ -2,12 +2,12 @@
 
 namespace FewBox.Core.Persistence.Orm
 {
-    public class Entity
+    public class Entity<T>
     {
-        public Guid Id { get; set; }
+        public T Id { get; set; }
         public DateTime CreatedTime { get; set; }
         public DateTime ModifiedTime { get; set; }
-        public string CreatedBy { get; set; }
-        public string ModifiedBy { get; set; }
+        public T CreatedBy { get; set; }
+        public T ModifiedBy { get; set; }
     }
 }

@@ -6,14 +6,12 @@ namespace FewBox.Core.Persistence.Orm
     {
         public IDbConnection Connection { get; private set; }
         public IDbTransaction Transaction { get; private set; }
-        public CurrentUser CurrentUser { get; private set; }
 
-        public UnitOfWork(IDbConnection connection, CurrentUser currentUser)
+        public UnitOfWork(IDbConnection connection)
         {
             this.Connection = connection;
             this.Connection.Open();
             this.Transaction = connection.BeginTransaction();
-            this.CurrentUser = currentUser;
         }
 
         public void Reset()

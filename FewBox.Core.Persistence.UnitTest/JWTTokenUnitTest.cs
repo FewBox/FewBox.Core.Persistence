@@ -12,14 +12,14 @@ namespace FewBox.Core.Persistence.UnitTest
     public class JWTTokenUnitTest
     {
         private ITokenService TokenService { get; set; }
-        private CurrentUser CurrentUser { get; set; }
+        private UserInfo UserInfo { get; set; }
 
         [TestInitialize]
         public void Init()
         {
             Guid userId = Guid.NewGuid();
             this.TokenService = new JWTToken();
-            this.CurrentUser = new CurrentUser { 
+            this.UserInfo = new UserInfo { 
                 Id = userId.ToString(),
                 Key = "EnVsakc0bNXs1UYHAiOjE1ND",
                 Issuer = "https://fewbox.com",
@@ -30,8 +30,8 @@ namespace FewBox.Core.Persistence.UnitTest
         [TestMethod]
         public void TestToken()
         {
-            string token = this.TokenService.GenerateToken(this.CurrentUser, TimeSpan.FromMinutes(5));
-            Assert.AreEqual(this.CurrentUser.Id, this.TokenService.GetUserIdByToken(token));
+            string token = this.TokenService.GenerateToken(this.UserInfo, TimeSpan.FromMinutes(5));
+            Assert.AreEqual(this.UserInfo.Id, this.TokenService.GetUserIdByToken(token));
         }
     }
 }
