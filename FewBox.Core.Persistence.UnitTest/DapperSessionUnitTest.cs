@@ -19,12 +19,7 @@ namespace FewBox.Core.Persistence.UnitTest
         [TestInitialize]
         public void Init()
         {
-            string fileName = Environment.GetEnvironmentVariable("SQLITEFILENAME");
-            if(String.IsNullOrEmpty(fileName))
-            {
-                fileName = "FewBox.sqlite";
-            }
-            string filePath = $"{Environment.CurrentDirectory}/{fileName}";
+            string filePath = $"{Environment.CurrentDirectory}/FewBox.sqlite";
             if(!File.Exists(filePath))
             {
                 throw new Exception($"The SQLite file '{filePath}' is not exists!");
