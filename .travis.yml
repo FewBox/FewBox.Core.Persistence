@@ -7,7 +7,7 @@ install:
   - dotnet restore $TRAVIS_BUILD_DIR/$PROJECTNAME/$PROJECTNAME.csproj
   - dotnet restore $TRAVIS_BUILD_DIR/$PROJECTUNITTESTNAME/$PROJECTUNITTESTNAME.csproj
 script:
-  - cp $TRAVIS_BUILD_DIR/$PROJECTUNITTESTNAME/FewBox.sqlite $TRAVIS_BUILD_DIR/bin/Debug/netcoreapp2.1/$SQLITEFILENAME
+  - cp $TRAVIS_BUILD_DIR/$PROJECTUNITTESTNAME/FewBox.sqlite $TRAVIS_BUILD_DIR/$PROJECTUNITTESTNAME/bin/Debug/netcoreapp2.1/$SQLITEFILENAME
   - dotnet test $TRAVIS_BUILD_DIR/$PROJECTUNITTESTNAME/$PROJECTUNITTESTNAME.csproj # q[uiet], m[inimal], n[ormal], d[etailed], and diag[nostic]
   - dotnet pack -c Release $TRAVIS_BUILD_DIR/$PROJECTNAME/$PROJECTNAME.csproj
 after_success:
