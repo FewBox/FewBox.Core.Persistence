@@ -1,6 +1,7 @@
 ﻿using FewBox.Core.Persistence.Orm;
 using Microsoft.Extensions.Caching.Memory;
 using System;
+using System.Linq;
 
 namespace FewBox.Core.Persistence.Cache
 {
@@ -16,13 +17,25 @@ namespace FewBox.Core.Persistence.Cache
         public string GenerateToken(UserInfo userInfo, TimeSpan expiredTime)
         {
             string token = Guid.NewGuid().ToString();
-            this.MemoryCache.Set<string>(token, userInfo.Id.ToString(), expiredTime);
+            var userProfile = new UserProfile{
+                Issuer = userInfo.Issuer,
+                Id = userInfo.Id!=null ? userInfo.Id.ToString() : String.Empty,
+                DisplayName = userInfo.Claims!=null ? userInfo.Claims.FirstOrDefault(c => c.Type == "DisplayName").Value : String.Empty,
+                Title = userInfo.Claims!=null ? userInfo.Claims.FirstOrDefault(c => c.Type == "Title").Value : String.Empty,
+                Department = userInfo.Claims!=null ? userInfo.Claims.FirstOrDefault(c => c.Type == "Department").Value : String.Empty
+            };
+            this.MemoryCache.Set<UserProfile>(token, userProfile, expiredTime);
             return token;
         }
 
         public string GetUserIdByToken(string token)
         {
-            return this.MemoryCache.Get<string>(token);
+            return this.MemoryCache.Get<UserProfile>(token).Id;
+        }
+
+        public UserProfile GetUserProfileByToken(string token)
+        {
+            return this.MemoryCache.Get<UserProfile>(token);
         }
     }
 }

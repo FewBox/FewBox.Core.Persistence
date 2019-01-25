@@ -1,7 +1,8 @@
 ﻿using FewBox.Core.Persistence.Orm;
+using FewBox.Core.Utility.Formatter;
 using Microsoft.Extensions.Caching.Distributed;
 using System;
-using System.Text;
+using System.Linq;
 
 namespace FewBox.Core.Persistence.Cache
 {
@@ -21,14 +22,27 @@ namespace FewBox.Core.Persistence.Cache
             {
                 AbsoluteExpirationRelativeToNow = expiredTime
             };
-            this.DistributedCache.SetString(token.ToString(), userInfo.Id.ToString(), distributedCacheEntryOptions);
+            var userProfile = new UserProfile{
+                Issuer = userInfo.Issuer,
+                Id = userInfo.Id.ToString(),
+                DisplayName = userInfo.Claims.FirstOrDefault(c => c.Type == "DisplayName").Value,
+                Title = userInfo.Claims.FirstOrDefault(c => c.Type == "Title").Value,
+                Department = userInfo.Claims.FirstOrDefault(c => c.Type == "Department").Value
+            };
+            this.DistributedCache.SetString(token.ToString(), JsonUtility.Serialize<UserProfile>(userProfile), distributedCacheEntryOptions);
             return token;
         }
 
         public string GetUserIdByToken(string token)
         {
-            string userIdString = this.DistributedCache.GetString(token.ToString());
-            return userIdString;
+            string userProfileString = this.DistributedCache.GetString(token.ToString());
+            return JsonUtility.Deserialize<UserProfile>(userProfileString).Id;
+        }
+
+        public UserProfile GetUserProfileByToken(string token)
+        {
+            string userProfileString = this.DistributedCache.GetString(token.ToString());
+            return JsonUtility.Deserialize<UserProfile>(userProfileString);
         }
     }
 }

@@ -7,5 +7,6 @@ namespace FewBox.Core.Persistence.Cache
     {
         string GenerateToken(UserInfo userInfo, TimeSpan expiredTime);
         string GetUserIdByToken(string token);
+        UserProfile GetUserProfileByToken(string token);
     }
 }

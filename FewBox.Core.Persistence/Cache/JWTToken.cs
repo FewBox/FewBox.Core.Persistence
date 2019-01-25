@@ -19,7 +19,10 @@ namespace FewBox.Core.Persistence.Cache
             var token = new JwtSecurityToken(
                 userInfo.Issuer,
                 userInfo.Issuer,
-                userInfo.Claims.Union( new List<Claim>{ new Claim("Id", userInfo.Id.ToString(), ClaimTypes.NameIdentifier)} ),
+                userInfo.Claims.Union( new List<Claim>{ 
+                    new Claim("Id", userInfo.Id.ToString(), "Id"),
+                    new Claim("Issuer", userInfo.Issuer, "Issuer" )
+                }),
                 expires: DateTime.Now.AddTicks(expiredTime.Ticks),
                 signingCredentials: creds);
             return new JwtSecurityTokenHandler().WriteToken(token);
@@ -30,6 +33,30 @@ namespace FewBox.Core.Persistence.Cache
             var handler = new JwtSecurityTokenHandler();
             var jsonToken = handler.ReadToken(token) as JwtSecurityToken;
             return jsonToken.Claims.FirstOrDefault(c => c.Type == "Id").Value;
+        }
+
+        public UserProfile GetUserProfileByToken(string token)
+        {
+            var handler = new JwtSecurityTokenHandler();
+            var jsonToken = handler.ReadToken(token) as JwtSecurityToken;
+            return new UserProfile{
+                Id = this.GetClaimValue(jsonToken.Claims, "Id"),
+                Issuer = this.GetClaimValue(jsonToken.Claims, "Issuer"),
+                DisplayName = this.GetClaimValue(jsonToken.Claims, "DisplayName"),
+                Title = this.GetClaimValue(jsonToken.Claims, "Title"),
+                Department = this.GetClaimValue(jsonToken.Claims, "Department")
+            };
+        }
+
+        private string GetClaimValue(IEnumerable<Claim> claims, string name)
+        {
+            string value = String.Empty;
+            var claim = claims.FirstOrDefault(c => c.Type == name);
+            if(claim!=null)
+            {
+                value = claim.Value;
+            }
+            return value;
         }
     }
 }

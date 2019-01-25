@@ -23,7 +23,7 @@ namespace FewBox.Core.Persistence.UnitTest
                 Id = userId.ToString(),
                 Key = "EnVsakc0bNXs1UYHAiOjE1ND",
                 Issuer = "https://fewbox.com",
-                Claims = new List<Claim>{  }
+                Claims = new List<Claim>{ new Claim("DisplayName", "landpy", "DisplayName" ) }
                 };
         }
 
@@ -32,6 +32,7 @@ namespace FewBox.Core.Persistence.UnitTest
         {
             string token = this.TokenService.GenerateToken(this.UserInfo, TimeSpan.FromMinutes(5));
             Assert.AreEqual(this.UserInfo.Id, this.TokenService.GetUserIdByToken(token));
+            //Assert.AreEqual("landpy", this.TokenService.GetUserProfileByToken(token).DisplayName);
         }
     }
 }

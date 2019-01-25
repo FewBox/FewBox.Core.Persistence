@@ -5,7 +5,7 @@
     <Copyright>FewBox (c) 2019</Copyright>
     <PackageLicenseUrl>https://raw.githubusercontent.com/FewBox/FewBox.Core.Persistence/master/LICENSE</PackageLicenseUrl>
     <PackageProjectUrl>https://fewbox.com</PackageProjectUrl>
-    <PackageTags>Utility</PackageTags>
+    <PackageTags>Persistence</PackageTags>
     <Version>1.0.20</Version>
     <PackageIconUrl>https://secure.gravatar.com/avatar/ce54e932b36c8d58321cc956410c37ed</PackageIconUrl>
     <RepositoryUrl>https://github.com/FewBox/FewBox.Core.Persistence</RepositoryUrl>
@@ -18,6 +18,7 @@
 
   <ItemGroup>
     <PackageReference Include="Dapper" Version="1.50.5" />
+    <PackageReference Include="FewBox.Core.Utility" Version="1.0.10" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="2.1.0" />
     <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.1.0" />
     <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="2.1.0" />
