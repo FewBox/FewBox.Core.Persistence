@@ -1,5 +1,4 @@
-﻿using FewBox.Core.Persistence.Cache;
-using System.Data;
+﻿using System.Data;
 using System.Data.Common;
 
 namespace FewBox.Core.Persistence.Orm
@@ -9,7 +8,7 @@ namespace FewBox.Core.Persistence.Orm
         public IUnitOfWork UnitOfWork { get; set; }
         private IDbConnection Connection { get; set; }
 
-        protected OrmSession(IOrmConfiguration ormConfiguration, ITokenService tokenService)
+        protected OrmSession(IOrmConfiguration ormConfiguration)
         {
             this.Connection = this.GetDbConnection(ormConfiguration.GetConnectionString());
             this.UnitOfWork = new UnitOfWork(this.Connection);

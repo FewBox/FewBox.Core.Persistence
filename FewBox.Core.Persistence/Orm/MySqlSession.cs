@@ -1,13 +1,12 @@
-﻿using FewBox.Core.Persistence.Cache;
-using MySql.Data.MySqlClient;
+﻿using MySql.Data.MySqlClient;
 using System.Data.Common;
 
 namespace FewBox.Core.Persistence.Orm
 {
     public class MySqlSession : OrmSession
     {
-        public MySqlSession(IOrmConfiguration ormConfiguration, ITokenService tokenService) 
-        : base(ormConfiguration, tokenService)
+        public MySqlSession(IOrmConfiguration ormConfiguration) 
+        : base(ormConfiguration)
         {
         }
 

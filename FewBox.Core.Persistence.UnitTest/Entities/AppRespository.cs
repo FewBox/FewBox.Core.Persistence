@@ -1,5 +1,4 @@
 using FewBox.Core.Persistence.Orm;
-using Microsoft.AspNetCore.Http;
 
 namespace FewBox.Core.Persistence.UnitTest
 {

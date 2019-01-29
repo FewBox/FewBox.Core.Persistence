@@ -1,10 +1,6 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Security.Claims;
-using FewBox.Core.Persistence.Cache;
 using FewBox.Core.Persistence.Orm;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 
@@ -26,11 +22,9 @@ namespace FewBox.Core.Persistence.UnitTest
             }
             var ormConfigurationMock = new Mock<IOrmConfiguration>();
             ormConfigurationMock.Setup(x => x.GetConnectionString()).Returns($"Data Source={filePath}"); //Server=localhost;Database=fewbox;Uid=fewbox;Pwd=fewbox;SslMode=REQUIRED;Charset=utf8;ConnectionTimeout=60;DefaultCommandTimeout=60;
-            var tokenServiceMock = new Mock<ITokenService>();
-            tokenServiceMock.Setup(x => x.GenerateToken(It.IsAny<UserInfo>(), TimeSpan.MaxValue)).Returns("");
             var currentUserMock = new Mock<ICurrentUser<string>>();
             currentUserMock.Setup(x => x.GetId()).Returns(Guid.Empty.ToString());
-            this.DapperSession = new SQLiteSession(ormConfigurationMock.Object, tokenServiceMock.Object);
+            this.DapperSession = new SQLiteSession(ormConfigurationMock.Object);
             this.AppRespository = new AppRespository("app", this.DapperSession, currentUserMock.Object);
         }
 
