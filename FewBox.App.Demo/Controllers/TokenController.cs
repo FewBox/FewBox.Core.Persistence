@@ -14,6 +14,7 @@ namespace FewBox.App.Demo.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class TokenController : ControllerBase
     {
         private ITokenService TokenService { get; set; }
@@ -35,7 +36,20 @@ namespace FewBox.App.Demo.Controllers
                     Id = Guid.NewGuid().ToString(),
                     Key = this.JWTConfig.Key,
                     Issuer = this.JWTConfig.Issuer,
-                    Claims = new List<Claim>{  }
+                    Claims = new List<Claim>{ 
+                        new Claim( ClaimTypes.Role, "Admin"), 
+                        new Claim(ClaimTypes.Role,"Normal") }
+                };
+                string token = this.TokenService.GenerateToken(userInfo, TimeSpan.FromMinutes(5));
+                return new SignInResponseDto { IsValid = true, Token = token };
+            }
+            else if(signInRequestDto.Username=="fewbox" && signInRequestDto.Password=="landpy")
+            {
+                var userInfo = new UserInfo { 
+                    Id = Guid.NewGuid().ToString(),
+                    Key = this.JWTConfig.Key,
+                    Issuer = this.JWTConfig.Issuer,
+                    Claims = new List<Claim>{ new Claim(ClaimTypes.Role,"Normal") }
                 };
                 string token = this.TokenService.GenerateToken(userInfo, TimeSpan.FromMinutes(5));
                 return new SignInResponseDto { IsValid = true, Token = token };
@@ -46,5 +60,16 @@ namespace FewBox.App.Demo.Controllers
             }
         }
 
+        [AllowAnonymous]
+        [HttpGet("claims")]
+        public object Claims()
+        {
+            return User.Claims.Select(c =>
+            new
+            {
+                Type = c.Type,
+                Value = c.Value
+            });
+        }
     }
 }

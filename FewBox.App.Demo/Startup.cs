@@ -15,6 +15,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Swashbuckle.AspNetCore.Swagger;
 
 namespace FewBox.App.Demo
 {
@@ -48,6 +49,18 @@ namespace FewBox.App.Demo
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtConfig.Key))
                 };
             });
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new Info { Title = "FewBox API", Version = "v1" });
+                c.AddSecurityDefinition("Bearer", new ApiKeyScheme { In = "header", Description = @"Please enter JWT with Bearer into field. Example: 'Bearer {token}'", Name = "Authorization", Type = "apiKey" });
+                c.AddSecurityRequirement(new Dictionary<string, IEnumerable<string>> {
+                    { "Bearer", Enumerable.Empty<string>() },
+                });
+                // c.SwaggerDoc("v2", new Info { Title = "FewBox API", Version = "v2" });
+                // var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                // var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                // c.IncludeXmlComments(xmlPath);
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -65,6 +78,14 @@ namespace FewBox.App.Demo
             app.UseAuthentication();
             //app.UseHttpsRedirection();
             app.UseMvc();
+            app.UseSwagger();
+            app.UseStaticFiles();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "FewBox API V1");
+                // c.SwaggerEndpoint("/swagger/v2/swagger.json", "FewBox API V2");
+                c.RoutePrefix = String.Empty;
+            });
         }
     }
 }

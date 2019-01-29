@@ -13,36 +13,60 @@ namespace FewBox.App.Demo.Controllers
     [Authorize]
     public class ValuesController : ControllerBase
     {
+        private IList<Value> Values { get; set; }
+
+        public ValuesController()
+        {
+            this.Values = new List<Value> { 
+                new Value { Id = 1, Content = "Value1" },
+                new Value { Id = 2, Content = "Value2" }
+            };
+        }
+
         // GET api/values
         [HttpGet]
-        public ActionResult<IEnumerable<string>> Get()
+        [Authorize(Roles = "Normal")]
+        public IList<Value> Get()
         {
-            return new string[] { "value1", "value2" };
+            return this.Values;
         }
 
         // GET api/values/5
+        [Authorize(Roles = "Normal")]
         [HttpGet("{id}")]
-        public ActionResult<string> Get(int id)
+        public Value Get(int id)
         {
-            return "value";
+            return this.Values.Where(p=>p.Id==id).SingleOrDefault();
         }
 
         // POST api/values
         [HttpPost]
-        public void Post([FromBody] string value)
+        [Authorize(Roles = "Admin")]
+        public dynamic Post([FromBody] Value value)
         {
+            return new { IsSuccessful = true };
         }
 
         // PUT api/values/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        [Authorize(Roles = "Admin")]
+        public dynamic Put(int id, [FromBody] Value value)
         {
+            return new { IsSuccessful = true };
         }
 
         // DELETE api/values/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        [Authorize(Roles = "Admin")]
+        public dynamic Delete(int id)
         {
+            return new { IsSuccessful = true };
+        }
+
+        public class Value
+        {
+            public int Id { get; set; }
+            public string Content { get; set; }
         }
     }
 }
