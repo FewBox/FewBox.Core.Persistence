@@ -9,7 +9,7 @@ namespace FewBox.Core.Persistence.UnitTest
     [TestClass]
     public class OrmSessionUnitTest
     {
-        private IOrmSession DapperSession { get; set; }
+        private IOrmSession OrmSession { get; set; }
         private IAppRespository AppRespository { get; set; }
 
         [TestInitialize]
@@ -24,8 +24,8 @@ namespace FewBox.Core.Persistence.UnitTest
             ormConfigurationMock.Setup(x => x.GetConnectionString()).Returns($"Data Source={filePath}"); //Server=localhost;Database=fewbox;Uid=fewbox;Pwd=fewbox;SslMode=REQUIRED;Charset=utf8;ConnectionTimeout=60;DefaultCommandTimeout=60;
             var currentUserMock = new Mock<ICurrentUser<string>>();
             currentUserMock.Setup(x => x.GetId()).Returns(Guid.Empty.ToString());
-            this.DapperSession = new SQLiteSession(ormConfigurationMock.Object);
-            this.AppRespository = new AppRespository("app", this.DapperSession, currentUserMock.Object);
+            this.OrmSession = new SQLiteSession(ormConfigurationMock.Object);
+            this.AppRespository = new AppRespository("app", this.OrmSession, currentUserMock.Object);
         }
 
         [TestMethod]
@@ -55,16 +55,16 @@ namespace FewBox.Core.Persistence.UnitTest
             try
             {
                 action();
-                this.DapperSession.UnitOfWork.Commit();
+                this.OrmSession.UnitOfWork.Commit();
             }
             catch (Exception exception)
             {
-                this.DapperSession.UnitOfWork.Rollback();
+                this.OrmSession.UnitOfWork.Rollback();
                 Assert.Fail(exception.Message + exception.StackTrace);
             }
             finally
             {
-                this.DapperSession.UnitOfWork.Reset();
+                this.OrmSession.UnitOfWork.Reset();
             }
         }
     }
