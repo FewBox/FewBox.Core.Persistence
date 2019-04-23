@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using FewBox.Core.Persistence.Orm;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -7,7 +7,7 @@ using Moq;
 namespace FewBox.Core.Persistence.UnitTest
 {
     [TestClass]
-    public class DapperSessionUnitTest
+    public class OrmSessionUnitTest
     {
         private IOrmSession DapperSession { get; set; }
         private IAppRespository AppRespository { get; set; }

@@ -12,10 +12,10 @@ namespace FewBox.Core.Persistence.Orm
         protected IUnitOfWork UnitOfWork { get; set; }
         protected ICurrentUser<TID> CurrentUser { get; set; }
 
-        protected BaseRepository(string tableName, IOrmSession dapperSession, ICurrentUser<TID> currentUser)
+        protected BaseRepository(string tableName, IOrmSession ormSession, ICurrentUser<TID> currentUser)
         {
             this.TableName = tableName;
-            this.UnitOfWork = dapperSession.UnitOfWork;
+            this.UnitOfWork = ormSession.UnitOfWork;
             this.CurrentUser = currentUser;
         }
 

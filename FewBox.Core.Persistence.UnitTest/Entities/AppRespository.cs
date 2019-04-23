@@ -4,8 +4,8 @@ namespace FewBox.Core.Persistence.UnitTest
 {
     public class AppRespository : BaseRepository<App, string>, IAppRespository
     {
-        public AppRespository(string tableName, IOrmSession dapperSession, ICurrentUser<string> currentUser) 
-        : base(tableName, dapperSession, currentUser)
+        public AppRespository(string tableName, IOrmSession ormSession, ICurrentUser<string> currentUser) 
+        : base(tableName, ormSession, currentUser)
         {
         }
 
