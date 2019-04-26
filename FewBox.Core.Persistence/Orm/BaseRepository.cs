@@ -154,8 +154,14 @@ namespace FewBox.Core.Persistence.Orm
 
         private TID GenerateNewId()
         {
-            TID id = (TID)Convert.ChangeType(Guid.NewGuid().ToString(), typeof(TID));
-            return id;
+            if(typeof(TID).Name=="Guid")
+            {
+                return (TID)Convert.ChangeType(Guid.NewGuid(), typeof(TID));
+            }
+            else
+            {
+                return (TID)Convert.ChangeType(Guid.NewGuid().ToString(), typeof(TID));   
+            }
         }
 
         protected void InitUpdateDefaultProperty(TEntity entity)
