@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
+using FewBox.Core.Utility.Converter;
 
 namespace FewBox.Core.Persistence.Orm
 {
@@ -146,22 +147,10 @@ namespace FewBox.Core.Persistence.Orm
 
         protected void InitSaveDefaultProperty(TEntity entity)
         {
-            entity.Id = this.GenerateNewId();
+            entity.Id = TypeUtility.Converte<TID>(Guid.NewGuid());
             entity.ModifiedTime = entity.CreatedTime = DateTime.UtcNow;
             entity.CreatedBy = this.CurrentUser.GetId();
             entity.ModifiedBy = this.CurrentUser.GetId();
-        }
-
-        private TID GenerateNewId()
-        {
-            if(typeof(TID).Name=="Guid")
-            {
-                return (TID)Convert.ChangeType(Guid.NewGuid(), typeof(TID));
-            }
-            else
-            {
-                return (TID)Convert.ChangeType(Guid.NewGuid().ToString(), typeof(TID));   
-            }
         }
 
         protected void InitUpdateDefaultProperty(TEntity entity)
