@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using Dapper;
 using FewBox.Core.Persistence.Orm;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
@@ -15,15 +16,16 @@ namespace FewBox.Core.Persistence.UnitTest
         [TestInitialize]
         public void Init()
         {
+            SqlMapper.AddTypeHandler(new SqliteGuidTypeHandler());
             string filePath = $"{Environment.CurrentDirectory}/FewBox.sqlite";
             if(!File.Exists(filePath))
             {
                 throw new Exception($"The SQLite file '{filePath}' is not exists!");
             }
             var ormConfigurationMock = new Mock<IOrmConfiguration>();
-            ormConfigurationMock.Setup(x => x.GetConnectionString()).Returns($"Data Source={filePath}"); //Server=localhost;Database=fewbox;Uid=fewbox;Pwd=fewbox;SslMode=REQUIRED;Charset=utf8;ConnectionTimeout=60;DefaultCommandTimeout=60;
-            var currentUserMock = new Mock<ICurrentUser<string>>();
-            currentUserMock.Setup(x => x.GetId()).Returns(Guid.Empty.ToString());
+            ormConfigurationMock.Setup(x => x.GetConnectionString()).Returns($"Data Source={filePath};BinaryGUID=True;"); //Server=localhost;Database=fewbox;Uid=fewbox;Pwd=fewbox;SslMode=REQUIRED;Charset=utf8;ConnectionTimeout=60;DefaultCommandTimeout=60;
+            var currentUserMock = new Mock<ICurrentUser<Guid>>();
+            currentUserMock.Setup(x => x.GetId()).Returns(Guid.Empty);
             this.OrmSession = new SQLiteSession(ormConfigurationMock.Object);
             this.AppRespository = new AppRespository("app", this.OrmSession, currentUserMock.Object);
         }
@@ -32,7 +34,7 @@ namespace FewBox.Core.Persistence.UnitTest
         public void TestSession()
         {
             int effectRows = 0;
-            string id = String.Empty;
+            Guid id = Guid.Empty;
             this.Wrapper(() => {
                 id = this.AppRespository.Save(new App { Name = "OldName", Key = "Key" });
             });
