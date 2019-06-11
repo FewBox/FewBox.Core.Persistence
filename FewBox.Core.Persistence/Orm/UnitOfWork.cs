@@ -35,9 +35,14 @@ namespace FewBox.Core.Persistence.Orm
 
         public void Dispose()
         {
+            this.Transaction.Dispose();
             this.Connection.Close();
             this.Connection.Dispose();
-            this.Transaction.Dispose();
-        }        
+        }
+
+        public void Stop()
+        {
+            this.Dispose();
+        }
     }
 }

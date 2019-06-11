@@ -69,7 +69,7 @@ namespace FewBox.Core.Persistence.UnitTest
             }
             finally
             {
-                ormSession.Close();
+                ormSession.UnitOfWork.Stop();
             }
         }
     }

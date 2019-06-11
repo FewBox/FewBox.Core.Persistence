@@ -11,5 +11,6 @@ namespace FewBox.Core.Persistence.Orm
         void Reset();
         void Commit();
         void Rollback();
+        void Stop();
     }
 }
