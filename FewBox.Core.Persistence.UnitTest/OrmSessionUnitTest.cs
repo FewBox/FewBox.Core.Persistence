@@ -16,7 +16,7 @@ namespace FewBox.Core.Persistence.UnitTest
         [TestInitialize]
         public void Init()
         {
-            SqlMapper.AddTypeHandler(new SqliteGuidTypeHandler());
+            SqlMapper.AddTypeHandler(new SQLiteGuidTypeHandler());
             string filePath = $"{Environment.CurrentDirectory}/FewBox.sqlite";
             if(!File.Exists(filePath))
             {

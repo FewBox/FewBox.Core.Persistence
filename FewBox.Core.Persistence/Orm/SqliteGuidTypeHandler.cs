@@ -3,7 +3,7 @@ using System.Data;
 
 namespace FewBox.Core.Persistence.Orm
 {
-    public class SqliteGuidTypeHandler : Dapper.SqlMapper.TypeHandler<Guid>
+    public class SQLiteGuidTypeHandler : Dapper.SqlMapper.TypeHandler<Guid>
     {
         public override Guid Parse(object value)
         {
