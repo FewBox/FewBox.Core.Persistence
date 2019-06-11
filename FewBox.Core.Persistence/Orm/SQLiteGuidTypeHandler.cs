@@ -12,6 +12,10 @@ namespace FewBox.Core.Persistence.Orm
             {
                 guid = new Guid((byte[])value);
             }
+            else if(value is string)
+            {
+                Guid.TryParse(value.ToString(), out guid);
+            }
             return guid;
         }
 
