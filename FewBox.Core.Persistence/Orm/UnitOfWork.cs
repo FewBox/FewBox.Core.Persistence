@@ -10,8 +10,12 @@ namespace FewBox.Core.Persistence.Orm
         public UnitOfWork(IDbConnection connection)
         {
             this.Connection = connection;
+        }
+
+        public void Start()
+        {
             this.Connection.Open();
-            this.Transaction = connection.BeginTransaction();
+            this.Transaction = this.Connection.BeginTransaction();
         }
 
         public void Reset()
