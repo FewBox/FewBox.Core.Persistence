@@ -23,7 +23,7 @@ namespace FewBox.Core.Persistence.UnitTest
                 throw new Exception($"The SQLite file '{filePath}' is not exists!");
             }
             var ormConfigurationMock = new Mock<IOrmConfiguration>();
-            ormConfigurationMock.Setup(x => x.GetConnectionString()).Returns($"Data Source={filePath};BinaryGUID=True;"); //Server=localhost;Database=fewbox;Uid=fewbox;Pwd=fewbox;SslMode=REQUIRED;Charset=utf8;ConnectionTimeout=60;DefaultCommandTimeout=60;
+            ormConfigurationMock.Setup(x => x.GetConnectionString()).Returns($"Data Source={filePath};"); //Server=localhost;Database=fewbox;Uid=fewbox;Pwd=fewbox;SslMode=REQUIRED;Charset=utf8;ConnectionTimeout=60;DefaultCommandTimeout=60;
             this.OrmConfiguration = ormConfigurationMock.Object;
             var currentUserMock = new Mock<ICurrentUser<Guid>>();
             currentUserMock.Setup(x => x.GetId()).Returns(Guid.Empty);
@@ -34,17 +34,21 @@ namespace FewBox.Core.Persistence.UnitTest
         public void TestSession()
         {
             int effectRows = 0;
-            Guid id = Guid.Empty;
+            Guid id = Guid.NewGuid();
+            Guid char36Id = Guid.NewGuid();
             this.Wrapper((appRespository) => {
-                id = appRespository.Save(new App { Name = "OldName", Key = "Key" });
+                id = appRespository.Save(new App { Name = "OldName", Key = "Key", Char36Id = char36Id });
             });
             this.Wrapper((appRespository)=> {
                 var app = appRespository.FindOne(id);
                 Assert.AreEqual("OldName", app.Name);
+                Assert.AreEqual(char36Id, app.Char36Id);
                 app.Name = "NewName";
+                app.Char36Id = Guid.Empty;
                 appRespository.Update(app);
                 app = appRespository.FindOne(id);
                 Assert.AreEqual("NewName", app.Name);
+                Assert.AreEqual(Guid.Empty, app.Char36Id);
             });
             this.Wrapper((appRespository)=> {
                 effectRows = appRespository.Delete(id);

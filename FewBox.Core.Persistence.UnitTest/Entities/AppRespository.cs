@@ -12,12 +12,12 @@ namespace FewBox.Core.Persistence.UnitTest
 
         protected override string GetSaveSegmentSql()
         {
-            return "Name,`Key`";
+            return "Name,`Key`,Char36Id";
         }
 
         protected override string GetUpdateSegmentSql()
         {
-            return "Name,`Key`";
+            return "Name,`Key`,Char36Id";
         }
 
         protected override string GetUpdateWithUniqueKeyWhereSegmentSql()

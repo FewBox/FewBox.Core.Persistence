@@ -1,5 +1,8 @@
 using System;
 using System.Data;
+using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
 
 namespace FewBox.Core.Persistence.Orm
 {
@@ -14,14 +17,14 @@ namespace FewBox.Core.Persistence.Orm
             }
             else if(value is string)
             {
-                Guid.TryParse(value.ToString(), out guid);
+                guid = new Guid(value.ToString());
             }
             return guid;
         }
 
         public override void SetValue(IDbDataParameter parameter, Guid value)
         {
-            parameter.Value = value.ToString();
+            parameter.Value = value.ToByteArray();
         }
     }
 }

@@ -7,5 +7,6 @@ namespace FewBox.Core.Persistence.UnitTest
     {
         public string Name { get; set; }
         public string Key { get; set; }
+        public Guid Char36Id { get; set; }
     }
 }
