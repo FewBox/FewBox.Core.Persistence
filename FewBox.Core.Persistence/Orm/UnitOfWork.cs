@@ -10,8 +10,12 @@ namespace FewBox.Core.Persistence.Orm
         public UnitOfWork(IDbConnection connection)
         {
             this.Connection = connection;
+        }
+
+        public void Start()
+        {
             this.Connection.Open();
-            this.Transaction = connection.BeginTransaction();
+            this.Transaction = this.Connection.BeginTransaction();
         }
 
         public void Reset()
@@ -31,9 +35,14 @@ namespace FewBox.Core.Persistence.Orm
 
         public void Dispose()
         {
+            this.Transaction.Dispose();
             this.Connection.Close();
             this.Connection.Dispose();
-            this.Transaction.Dispose();
-        }        
+        }
+
+        public void Stop()
+        {
+            this.Dispose();
+        }
     }
 }

@@ -1,5 +1,6 @@
 using System.Data.Common;
-using System.Data.SQLite;
+//using System.Data.SQLite;
+using Microsoft.Data.Sqlite;
 
 namespace FewBox.Core.Persistence.Orm
 {
@@ -12,7 +13,7 @@ namespace FewBox.Core.Persistence.Orm
 
         protected override DbConnection GetDbConnection(string connectionString)
         {
-            return new SQLiteConnection(connectionString);
+            return new SqliteConnection(connectionString);
         }
     }
 }

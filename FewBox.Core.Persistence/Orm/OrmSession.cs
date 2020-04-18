@@ -15,15 +15,5 @@ namespace FewBox.Core.Persistence.Orm
         }
 
         protected abstract DbConnection GetDbConnection(string connectionString);
-
-        public void Dispose()
-        {
-            this.UnitOfWork.Dispose();
-        }
-
-        public void Close()
-        {
-            this.Dispose();
-        }
     }
 }

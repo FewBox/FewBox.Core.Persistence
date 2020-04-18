@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using Dapper;
 using FewBox.Core.Persistence.Orm;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
@@ -9,62 +10,70 @@ namespace FewBox.Core.Persistence.UnitTest
     [TestClass]
     public class OrmSessionUnitTest
     {
-        private IOrmSession OrmSession { get; set; }
-        private IAppRespository AppRespository { get; set; }
+        private ICurrentUser<Guid> CurrentUser { get; set; }
+        private IOrmConfiguration OrmConfiguration { get; set; }
 
         [TestInitialize]
         public void Init()
         {
+            SqlMapper.AddTypeHandler(new SQLiteGuidTypeHandler());
             string filePath = $"{Environment.CurrentDirectory}/FewBox.sqlite";
             if(!File.Exists(filePath))
             {
                 throw new Exception($"The SQLite file '{filePath}' is not exists!");
             }
             var ormConfigurationMock = new Mock<IOrmConfiguration>();
-            ormConfigurationMock.Setup(x => x.GetConnectionString()).Returns($"Data Source={filePath}"); //Server=localhost;Database=fewbox;Uid=fewbox;Pwd=fewbox;SslMode=REQUIRED;Charset=utf8;ConnectionTimeout=60;DefaultCommandTimeout=60;
-            var currentUserMock = new Mock<ICurrentUser<string>>();
-            currentUserMock.Setup(x => x.GetId()).Returns(Guid.Empty.ToString());
-            this.OrmSession = new SQLiteSession(ormConfigurationMock.Object);
-            this.AppRespository = new AppRespository("app", this.OrmSession, currentUserMock.Object);
+            ormConfigurationMock.Setup(x => x.GetConnectionString()).Returns($"Data Source={filePath};"); //Server=localhost;Database=fewbox;Uid=fewbox;Pwd=fewbox;SslMode=REQUIRED;Charset=utf8;ConnectionTimeout=60;DefaultCommandTimeout=60;
+            this.OrmConfiguration = ormConfigurationMock.Object;
+            var currentUserMock = new Mock<ICurrentUser<Guid>>();
+            currentUserMock.Setup(x => x.GetId()).Returns(Guid.Empty);
+            this.CurrentUser = currentUserMock.Object;
         }
 
         [TestMethod]
         public void TestSession()
         {
             int effectRows = 0;
-            string id = String.Empty;
-            this.Wrapper(() => {
-                id = this.AppRespository.Save(new App { Name = "OldName", Key = "Key" });
+            Guid id = Guid.NewGuid();
+            Guid char36Id = Guid.NewGuid();
+            this.Wrapper((appRespository) => {
+                id = appRespository.Save(new App { Name = "OldName", Key = "Key", Char36Id = char36Id });
             });
-            this.Wrapper(()=> {
-                var app = this.AppRespository.FindOne(id);
+            this.Wrapper((appRespository)=> {
+                var app = appRespository.FindOne(id);
                 Assert.AreEqual("OldName", app.Name);
+                Assert.AreEqual(char36Id, app.Char36Id);
                 app.Name = "NewName";
-                this.AppRespository.Update(app);
-                app = this.AppRespository.FindOne(id);
+                app.Char36Id = Guid.Empty;
+                appRespository.Update(app);
+                app = appRespository.FindOne(id);
                 Assert.AreEqual("NewName", app.Name);
+                Assert.AreEqual(Guid.Empty, app.Char36Id);
             });
-            this.Wrapper(()=> {
-                effectRows = this.AppRespository.Delete(id);
+            this.Wrapper((appRespository)=> {
+                effectRows = appRespository.Delete(id);
                 Assert.AreEqual(1, effectRows);
             });
         }
 
-        private void Wrapper(Action action)
+        private void Wrapper(Action<IAppRespository> action)
         {
+            var ormSession = new SQLiteSession(this.OrmConfiguration);
+            var appRespository = new AppRespository("app", ormSession, this.CurrentUser);
             try
             {
-                action();
-                this.OrmSession.UnitOfWork.Commit();
+                ormSession.UnitOfWork.Start();
+                action(appRespository);
+                ormSession.UnitOfWork.Commit();
             }
             catch (Exception exception)
             {
-                this.OrmSession.UnitOfWork.Rollback();
+                ormSession.UnitOfWork.Rollback();
                 Assert.Fail(exception.Message + exception.StackTrace);
             }
             finally
             {
-                this.OrmSession.UnitOfWork.Reset();
+                ormSession.UnitOfWork.Stop();
             }
         }
     }

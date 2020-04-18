@@ -7,8 +7,10 @@ namespace FewBox.Core.Persistence.Orm
     {
         IDbConnection Connection { get; }
         IDbTransaction Transaction { get; }
+        void Start();
         void Reset();
         void Commit();
         void Rollback();
+        void Stop();
     }
 }
