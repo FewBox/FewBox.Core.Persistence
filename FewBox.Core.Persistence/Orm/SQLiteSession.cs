@@ -1,5 +1,4 @@
 using System.Data.Common;
-//using System.Data.SQLite;
 using Microsoft.Data.Sqlite;
 
 namespace FewBox.Core.Persistence.Orm
