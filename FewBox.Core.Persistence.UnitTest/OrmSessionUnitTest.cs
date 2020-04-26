@@ -43,14 +43,14 @@ namespace FewBox.Core.Persistence.UnitTest
                 {
                     appRespository.Clear();
                 }
-            });
+            }, "app");
             this.Wrapper((appRespository) =>
             {
                 // Create
                 Guid id = appRespository.Save(new App { Id = record1Id, Name = "FewBox1", Key = "Landpy1", Char36Id = char36Id });
                 Assert.AreEqual(record1Id, id);
                 record2Id = appRespository.Save(new App { Name = "FewBox2", Key = "Landpy2", Char36Id = char36Id });
-            });
+            }, "app");
             this.Wrapper((appRespository) =>
             {
                 // Read
@@ -61,7 +61,7 @@ namespace FewBox.Core.Persistence.UnitTest
                 app2.Name = "FewBox";
                 app2.Char36Id = Guid.Empty;
                 appRespository.Update(app2);
-            });
+            }, "app");
             this.Wrapper((appRespository) =>
             {
                 // Verify FindOne
@@ -73,15 +73,28 @@ namespace FewBox.Core.Persistence.UnitTest
                 Assert.IsTrue(apps.AsList().Count == 2);
                 Assert.AreEqual("FewBox", apps.AsList()[1].Name);
                 Assert.AreEqual(Guid.Empty, apps.AsList()[1].Char36Id);
-            });
+                // Verify Count
+                int count = appRespository.Count();
+                Assert.IsTrue(count == 2);
+                // Verify Recycle
+                appRespository.Recycle(record2Id);
+                count = appRespository.Count();
+                Assert.IsTrue(count == 1);
+            }, "app");
+            this.Wrapper((appRecycleRespository) =>
+            {
+                // Verify Recycle
+                int count = appRecycleRespository.Count();
+                Assert.IsTrue(count == 1);
+                // Truncate
+                appRecycleRespository.Clear();
+            }, "app_recycle");
             this.Wrapper((appRespository) =>
             {
                 // Delete
                 effectRows = appRespository.Delete(record1Id);
                 Assert.AreEqual(1, effectRows);
-                effectRows = appRespository.Delete(record2Id);
-                Assert.AreEqual(1, effectRows);
-            });
+            }, "app");
         }
 
         private bool VerifyTempData(IAppRespository appRespository)
@@ -89,10 +102,10 @@ namespace FewBox.Core.Persistence.UnitTest
             return appRespository.Count() > 0;
         }
 
-        private void Wrapper(Action<IAppRespository> action)
+        private void Wrapper(Action<IAppRespository> action, string tableName)
         {
             var ormSession = new SQLiteSession(this.OrmConfiguration);
-            var appRespository = new AppRespository("app", ormSession, this.CurrentUser);
+            var appRespository = new AppRespository(tableName, ormSession, this.CurrentUser);
             try
             {
                 ormSession.UnitOfWork.Start();

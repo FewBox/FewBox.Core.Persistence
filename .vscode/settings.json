@@ -4,6 +4,13 @@
             "database": "${workspaceFolder}\\FewBox.Core.Persistence.UnitTest\\FewBox.sqlite",
             "dialect": "SQLite",
             "name": "FewBox"
+        },
+        {
+            "database": ".\\FewBox.Core.Persistence.UnitTest\\FewBox.sqlite",
+            "dialect": "SQLite",
+            "isActive": true,
+            "isConnected": true,
+            "name": "FewBox"
         }
     ],
     "sqltools.useNodeRuntime": true
