@@ -3,19 +3,31 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
-using FewBox.Core.Utility.Converter;
 
 namespace FewBox.Core.Persistence.Orm
 {
-    public abstract class BaseRepository<TEntity, TID> : IBaseRepository<TEntity, TID> where TEntity: Entity<TID>
+    public abstract class BaseRepository<TEntity, TID> : IBaseRepository<TEntity, TID> where TEntity : BaseEntity<TID>
     {
         protected string TableName { get; set; }
         protected IUnitOfWork UnitOfWork { get; set; }
         protected ICurrentUser<TID> CurrentUser { get; set; }
+        protected SessionType SessionType { get; set; }
 
         protected BaseRepository(string tableName, IOrmSession ormSession, ICurrentUser<TID> currentUser)
         {
             this.TableName = tableName;
+            if (ormSession is MySqlSession)
+            {
+                this.SessionType = SessionType.MySql;
+            }
+            else if (ormSession is SQLiteSession)
+            {
+                this.SessionType = SessionType.SQLite;
+            }
+            else
+            {
+                this.SessionType = SessionType.Unknown;
+            }
             this.UnitOfWork = ormSession.UnitOfWork;
             this.CurrentUser = currentUser;
         }
@@ -147,11 +159,13 @@ namespace FewBox.Core.Persistence.Orm
 
         protected void InitSaveDefaultProperty(TEntity entity)
         {
-            entity.Id = TypeUtility.Converte<TID>(Guid.NewGuid());
+            entity.Id = this.GetID(entity.Id);
             entity.ModifiedTime = entity.CreatedTime = DateTime.UtcNow;
             entity.CreatedBy = this.CurrentUser.GetId();
             entity.ModifiedBy = this.CurrentUser.GetId();
         }
+
+        protected abstract TID GetID(TID id);
 
         protected void InitUpdateDefaultProperty(TEntity entity)
         {
@@ -248,5 +262,37 @@ namespace FewBox.Core.Persistence.Orm
         protected abstract string GetUpdateSegmentSql();
 
         protected abstract string GetUpdateWithUniqueKeyWhereSegmentSql();
+
+        public Task<int> ClearAsync()
+        {
+            if (this.SessionType == SessionType.MySql)
+            {
+                return this.UnitOfWork.Connection.ExecuteAsync($"truncate table {this.TableName}");
+            }
+            else if (this.SessionType == SessionType.SQLite)
+            {
+                return this.UnitOfWork.Connection.ExecuteAsync($"delete from {this.TableName}");
+            }
+            else
+            {
+                throw new Exception("Unkown session type!");
+            }
+        }
+
+        public int Clear()
+        {
+            if (this.SessionType == SessionType.MySql)
+            {
+                return this.UnitOfWork.Connection.Execute($"truncate table {this.TableName}");
+            }
+            else if (this.SessionType == SessionType.SQLite)
+            {
+                return this.UnitOfWork.Connection.Execute($"delete from {this.TableName}");
+            }
+            else
+            {
+                throw new Exception("Unkown session type!");
+            }
+        }
     }
 }

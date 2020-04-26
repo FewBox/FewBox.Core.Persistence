@@ -3,7 +3,7 @@ using FewBox.Core.Persistence.Orm;
 
 namespace FewBox.Core.Persistence.UnitTest
 {
-    public class App : Entity<Guid>
+    public class App : Entity
     {
         public string Name { get; set; }
         public string Key { get; set; }

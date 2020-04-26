@@ -1,0 +1,10 @@
+{
+    "sqltools.connections": [
+        {
+            "database": "${workspaceFolder}\\FewBox.Core.Persistence.UnitTest\\FewBox.sqlite",
+            "dialect": "SQLite",
+            "name": "FewBox"
+        }
+    ],
+    "sqltools.useNodeRuntime": true
+}

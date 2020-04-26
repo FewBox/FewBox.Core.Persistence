@@ -18,7 +18,7 @@ namespace FewBox.Core.Persistence.UnitTest
         {
             SqlMapper.AddTypeHandler(new SQLiteGuidTypeHandler());
             string filePath = $"{Environment.CurrentDirectory}/FewBox.sqlite";
-            if(!File.Exists(filePath))
+            if (!File.Exists(filePath))
             {
                 throw new Exception($"The SQLite file '{filePath}' is not exists!");
             }
@@ -34,26 +34,59 @@ namespace FewBox.Core.Persistence.UnitTest
         public void TestSession()
         {
             int effectRows = 0;
-            Guid id = Guid.NewGuid();
+            Guid record1Id = new Guid("00000000-0000-0000-0000-000000000001");
+            Guid record2Id = Guid.Empty;
             Guid char36Id = Guid.NewGuid();
-            this.Wrapper((appRespository) => {
-                id = appRespository.Save(new App { Name = "OldName", Key = "Key", Char36Id = char36Id });
+            this.Wrapper((appRespository) =>
+            {
+                if (this.VerifyTempData(appRespository))
+                {
+                    appRespository.Clear();
+                }
             });
-            this.Wrapper((appRespository)=> {
-                var app = appRespository.FindOne(id);
-                Assert.AreEqual("OldName", app.Name);
-                Assert.AreEqual(char36Id, app.Char36Id);
-                app.Name = "NewName";
-                app.Char36Id = Guid.Empty;
-                appRespository.Update(app);
-                app = appRespository.FindOne(id);
-                Assert.AreEqual("NewName", app.Name);
-                Assert.AreEqual(Guid.Empty, app.Char36Id);
+            this.Wrapper((appRespository) =>
+            {
+                // Create
+                Guid id = appRespository.Save(new App { Id = record1Id, Name = "FewBox1", Key = "Landpy1", Char36Id = char36Id });
+                Assert.AreEqual(record1Id, id);
+                record2Id = appRespository.Save(new App { Name = "FewBox2", Key = "Landpy2", Char36Id = char36Id });
             });
-            this.Wrapper((appRespository)=> {
-                effectRows = appRespository.Delete(id);
+            this.Wrapper((appRespository) =>
+            {
+                // Read
+                var app2 = appRespository.FindOne(record2Id);
+                Assert.AreEqual("FewBox2", app2.Name);
+                Assert.AreEqual(char36Id, app2.Char36Id);
+                // Update
+                app2.Name = "FewBox";
+                app2.Char36Id = Guid.Empty;
+                appRespository.Update(app2);
+            });
+            this.Wrapper((appRespository) =>
+            {
+                // Verify FindOne
+                var app2 = appRespository.FindOne(record2Id);
+                Assert.AreEqual("FewBox", app2.Name);
+                Assert.AreEqual(Guid.Empty, app2.Char36Id);
+                // Verify FindAll
+                var apps = appRespository.FindAll();
+                Assert.IsTrue(apps.AsList().Count == 2);
+                Assert.AreEqual("FewBox", apps.AsList()[1].Name);
+                Assert.AreEqual(Guid.Empty, apps.AsList()[1].Char36Id);
+            });
+            this.Wrapper((appRespository) =>
+            {
+                // Delete
+                effectRows = appRespository.Delete(record1Id);
+                Assert.AreEqual(1, effectRows);
+                effectRows = appRespository.Delete(record2Id);
                 Assert.AreEqual(1, effectRows);
             });
+        }
+
+        private bool VerifyTempData(IAppRespository appRespository)
+        {
+            return appRespository.Count() > 0;
         }
 
         private void Wrapper(Action<IAppRespository> action)

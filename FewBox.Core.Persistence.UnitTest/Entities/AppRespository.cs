@@ -3,7 +3,7 @@ using FewBox.Core.Persistence.Orm;
 
 namespace FewBox.Core.Persistence.UnitTest
 {
-    public class AppRespository : BaseRepository<App, Guid>, IAppRespository
+    public class AppRespository : Repository<App>, IAppRespository
     {
         public AppRespository(string tableName, IOrmSession ormSession, ICurrentUser<Guid> currentUser) 
         : base(tableName, ormSession, currentUser)

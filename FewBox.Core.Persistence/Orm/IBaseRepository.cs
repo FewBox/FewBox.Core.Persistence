@@ -21,6 +21,7 @@ namespace FewBox.Core.Persistence.Orm
         Task<int> BatchSaveAsync(IEnumerable<TEntity> entities);
         Task<int> BatchReplaceAsync(IEnumerable<TEntity> entities);
         Task<int> BatchUpdateByUniqueKeyAsync(IEnumerable<TEntity> entities);
+        Task<int> ClearAsync();
 
         #endregion
 
@@ -39,6 +40,7 @@ namespace FewBox.Core.Persistence.Orm
         int BatchSave(IEnumerable<TEntity> entities);
         int BatchReplace(IEnumerable<TEntity> entities);
         int BatchUpdateByUniqueKey(IEnumerable<TEntity> entities);
+        int Clear();
 
         #endregion
     }
