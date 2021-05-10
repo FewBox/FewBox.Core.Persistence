@@ -91,6 +91,8 @@ namespace FewBox.Core.Persistence.UnitTest
             }, "app_recycle");
             this.Wrapper((appRespository) =>
             {
+                // FindOne
+                var app = appRespository.FindOne(record1Id);
                 // Delete
                 effectRows = appRespository.Delete(record1Id);
                 Assert.AreEqual(1, effectRows);
