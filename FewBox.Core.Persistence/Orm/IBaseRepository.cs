@@ -22,6 +22,12 @@ namespace FewBox.Core.Persistence.Orm
         Task<int> BatchReplaceAsync(IEnumerable<TEntity> entities);
         Task<int> BatchUpdateByUniqueKeyAsync(IEnumerable<TEntity> entities);
         Task<int> ClearAsync();
+        Task<int> CountByCreatedByAsync(Guid createdBy);
+        Task<int> CountByModifiedByAsync(Guid modifiedBy);
+        Task<IEnumerable<TEntity>> FindAllByCreatedByAsync(Guid createdBy);
+        Task<IEnumerable<TEntity>> FindAllByModifiedByAsync(Guid modifiedBy);
+        Task<IEnumerable<TEntity>> FindAllByCreatedByAsync(Guid createdBy, int pageIndex, int pageRange);
+        Task<IEnumerable<TEntity>> FindAllByModifiedByAsync(Guid modifiedBy, int pageIndex, int pageRange);
 
         #endregion
 
@@ -41,7 +47,12 @@ namespace FewBox.Core.Persistence.Orm
         int BatchReplace(IEnumerable<TEntity> entities);
         int BatchUpdateByUniqueKey(IEnumerable<TEntity> entities);
         int Clear();
-
+        int CountByCreatedBy(Guid createdBy);
+        int CountByModifiedBy(Guid modifiedBy);
+        IEnumerable<TEntity> FindAllByCreatedBy(Guid createdBy);
+        IEnumerable<TEntity> FindAllByModifiedBy(Guid modifiedBy);
+        IEnumerable<TEntity> FindAllByCreatedBy(Guid createdBy, int pageIndex, int pageRange);
+        IEnumerable<TEntity> FindAllByModifiedBy(Guid modifiedBy, int pageIndex, int pageRange);
         #endregion
     }
 }

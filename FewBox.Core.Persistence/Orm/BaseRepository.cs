@@ -294,5 +294,68 @@ namespace FewBox.Core.Persistence.Orm
                 throw new Exception("Unkown session type!");
             }
         }
+
+        public Task<int> CountByCreatedByAsync(Guid createdBy)
+        {
+            return this.UnitOfWork.Connection.ExecuteScalarAsync<int>(String.Format(@"select count(1) from {0} where CreatedBy=@CreatedBy", this.TableName), new { CreatedBy = createdBy });
+        }
+
+        public Task<int> CountByModifiedByAsync(Guid modifiedBy)
+        {
+            return this.UnitOfWork.Connection.ExecuteScalarAsync<int>(String.Format(@"select count(1) from {0} where ModifiedBy=@ModifiedBy", this.TableName), new { ModifiedBy = modifiedBy });
+        }
+
+        public Task<IEnumerable<TEntity>> FindAllByCreatedByAsync(Guid createdBy)
+        {
+            return this.UnitOfWork.Connection.QueryAsync<TEntity>(String.Format(@"select * from {0} where CreatedBy=@CreatedBy", this.TableName), new { CreatedBy = createdBy });
+        }
+
+        public Task<IEnumerable<TEntity>> FindAllByModifiedByAsync(Guid modifiedBy)
+        {
+            return this.UnitOfWork.Connection.QueryAsync<TEntity>(String.Format(@"select * from {0} where ModifiedBy=@ModifiedBy", this.TableName), new { ModifiedBy = modifiedBy });
+        }
+
+        public Task<IEnumerable<TEntity>> FindAllByCreatedByAsync(Guid createdBy, int pageIndex, int pageRange)
+        {
+            int from = (pageIndex - 1) * pageRange;
+            return this.UnitOfWork.Connection.QueryAsync<TEntity>(String.Format(@"select * from {0} where CreatedBy=@CreatedBy limit @From,@PageRange", this.TableName), new { From = from, PageRange = pageRange, CreatedBy = createdBy });
+        }
+
+        public Task<IEnumerable<TEntity>> FindAllByModifiedByAsync(Guid modifiedBy, int pageIndex, int pageRange)
+        {
+            int from = (pageIndex - 1) * pageRange;
+            return this.UnitOfWork.Connection.QueryAsync<TEntity>(String.Format(@"select * from {0} where ModifiedBy=@ModifiedBy limit @From,@PageRange", this.TableName), new { From = from, PageRange = pageRange, ModifiedBy = modifiedBy });
+        }
+
+        public int CountByCreatedBy(Guid createdBy)
+        {
+            return this.UnitOfWork.Connection.ExecuteScalar<int>(String.Format(@"select count(1) from {0} where CreatedBy=@CreatedBy", this.TableName), new { CreatedBy = createdBy });
+        }
+
+        public int CountByModifiedBy(Guid modifiedBy)
+        {
+            return this.UnitOfWork.Connection.ExecuteScalar<int>(String.Format(@"select count(1) from {0} where ModifiedBy=@ModifiedBy", this.TableName), new { ModifiedBy = modifiedBy });
+        }
+
+        public IEnumerable<TEntity> FindAllByCreatedBy(Guid createdBy)
+        {
+            return this.UnitOfWork.Connection.Query<TEntity>(String.Format(@"select * from {0} where CreatedBy=@CreatedBy", this.TableName), new { CreatedBy = createdBy });
+        }
+
+        public IEnumerable<TEntity> FindAllByModifiedBy(Guid modifiedBy)
+        {
+            return this.UnitOfWork.Connection.Query<TEntity>(String.Format(@"select * from {0} where ModifiedBy=@ModifiedBy", this.TableName), new { ModifiedBy = modifiedBy });
+        }
+        public IEnumerable<TEntity> FindAllByCreatedBy(Guid createdBy, int pageIndex, int pageRange)
+        {
+            int from = (pageIndex - 1) * pageRange;
+            return this.UnitOfWork.Connection.Query<TEntity>(String.Format(@"select * from {0} where CreatedBy=@CreatedBy limit @From,@PageRange", this.TableName), new { From = from, PageRange = pageRange, CreatedBy = createdBy });
+        }
+
+        public IEnumerable<TEntity> FindAllByModifiedBy(Guid modifiedBy, int pageIndex, int pageRange)
+        {
+            int from = (pageIndex - 1) * pageRange;
+            return this.UnitOfWork.Connection.Query<TEntity>(String.Format(@"select * from {0} where ModifiedBy=@ModifiedBy limit @From,@PageRange", this.TableName), new { From = from, PageRange = pageRange, ModifiedBy = modifiedBy });
+        }
     }
 }
