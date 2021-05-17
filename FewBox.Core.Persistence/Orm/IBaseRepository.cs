@@ -10,7 +10,11 @@ namespace FewBox.Core.Persistence.Orm
 
         Task<int> CountAsync();
         Task<IEnumerable<TEntity>> FindAllAsync();
+        Task<IEnumerable<TEntity>> FindAllOrderByAsync(IEnumerable<string> fields, OrderType orderType);
+        Task<IEnumerable<TEntity>> FindAllOrderByAsync(IDictionary<string, OrderType> fieldOrders);
         Task<IEnumerable<TEntity>> FindAllAsync(int pageIndex, int pageRange);
+        Task<IEnumerable<TEntity>> FindAllOrderByAsync(int pageIndex, int pageRange, IEnumerable<string> fields, OrderType orderType);
+        Task<IEnumerable<TEntity>> FindAllOrderByAsync(int pageIndex, int pageRange, IDictionary<string, OrderType> fieldOrders);
         Task<TEntity> FindOneAsync(TID id);
         Task<int> SaveAsync(TEntity entity);
         Task<int> ReplaceAsync(TEntity entity);
@@ -35,7 +39,11 @@ namespace FewBox.Core.Persistence.Orm
 
         int Count();
         IEnumerable<TEntity> FindAll();
+        IEnumerable<TEntity> FindAllOrderBy(IEnumerable<string> fields, OrderType orderType);
+        IEnumerable<TEntity> FindAllOrderBy(IDictionary<string, OrderType> fieldOrders);
         IEnumerable<TEntity> FindAll(int pageIndex, int pageRange);
+        IEnumerable<TEntity> FindAllOrderBy(int pageIndex, int pageRange, IEnumerable<string> fields, OrderType orderType);
+        IEnumerable<TEntity> FindAllOrderBy(int pageIndex, int pageRange, IDictionary<string, OrderType> fieldOrders);
         TEntity FindOne(TID id);
         TID Save(TEntity entity);
         int Replace(TEntity entity);

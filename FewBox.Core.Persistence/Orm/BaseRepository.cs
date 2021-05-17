@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Dapper;
 
@@ -87,9 +88,29 @@ namespace FewBox.Core.Persistence.Orm
             return this.UnitOfWork.Connection.Query<TEntity>(String.Format(@"select * from {0}", this.TableName));
         }
 
+        public IEnumerable<TEntity> FindAllOrderBy(IEnumerable<string> fields, OrderType orderType)
+        {
+            return this.UnitOfWork.Connection.Query<TEntity>(String.Format(@"select * from {0} {1}", this.TableName, this.GetOrderSegment(fields, orderType)));
+        }
+
+        public IEnumerable<TEntity> FindAllOrderBy(IDictionary<string, OrderType> fieldOrders)
+        {
+            return this.UnitOfWork.Connection.Query<TEntity>(String.Format(@"select * from {0} {1}", this.TableName, this.GetOrderSegment(fieldOrders)));
+        }
+
         public Task<IEnumerable<TEntity>> FindAllAsync()
         {
             return this.UnitOfWork.Connection.QueryAsync<TEntity>(String.Format(@"select * from {0}", this.TableName));
+        }
+
+        public Task<IEnumerable<TEntity>> FindAllOrderByAsync(IEnumerable<string> fields, OrderType orderType)
+        {
+            return this.UnitOfWork.Connection.QueryAsync<TEntity>(String.Format(@"select * from {0} {1}", this.TableName, this.GetOrderSegment(fields, orderType)));
+        }
+
+        public Task<IEnumerable<TEntity>> FindAllOrderByAsync(IDictionary<string, OrderType> fieldOrders)
+        {
+            return this.UnitOfWork.Connection.QueryAsync<TEntity>(String.Format(@"select * from {0} {1}", this.TableName, this.GetOrderSegment(fieldOrders)));
         }
 
         public IEnumerable<TEntity> FindAll(int pageIndex, int pageRange)
@@ -98,10 +119,34 @@ namespace FewBox.Core.Persistence.Orm
             return this.UnitOfWork.Connection.Query<TEntity>(String.Format(@"select * from {0} limit @From,@PageRange", this.TableName), new { From = from, PageRange = pageRange });
         }
 
+        public IEnumerable<TEntity> FindAllOrderBy(int pageIndex, int pageRange, IEnumerable<string> fields, OrderType orderType)
+        {
+            int from = (pageIndex - 1) * pageRange;
+            return this.UnitOfWork.Connection.Query<TEntity>(String.Format(@"select * from {0} {1} limit @From,@PageRange", this.TableName, this.GetOrderSegment(fields, orderType)), new { From = from, PageRange = pageRange });
+        }
+
+        public IEnumerable<TEntity> FindAllOrderBy(int pageIndex, int pageRange, IDictionary<string, OrderType> fieldOrders)
+        {
+            int from = (pageIndex - 1) * pageRange;
+            return this.UnitOfWork.Connection.Query<TEntity>(String.Format(@"select * from {0} {1} limit @From,@PageRange", this.TableName, this.GetOrderSegment(fieldOrders)), new { From = from, PageRange = pageRange });
+        }
+
         public Task<IEnumerable<TEntity>> FindAllAsync(int pageIndex, int pageRange)
         {
             int from = (pageIndex - 1) * pageRange;
             return this.UnitOfWork.Connection.QueryAsync<TEntity>(String.Format(@"select * from {0} limit @From,@PageRange", this.TableName), new { From = from, PageRange = pageRange });
+        }
+
+        public Task<IEnumerable<TEntity>> FindAllOrderByAsync(int pageIndex, int pageRange, IEnumerable<string> fields, OrderType orderType)
+        {
+            int from = (pageIndex - 1) * pageRange;
+            return this.UnitOfWork.Connection.QueryAsync<TEntity>(String.Format(@"select * from {0} {1} limit @From,@PageRange", this.TableName, this.GetOrderSegment(fields, orderType)), new { From = from, PageRange = pageRange });
+        }
+
+        public Task<IEnumerable<TEntity>> FindAllOrderByAsync(int pageIndex, int pageRange, IDictionary<string, OrderType> fieldOrders)
+        {
+            int from = (pageIndex - 1) * pageRange;
+            return this.UnitOfWork.Connection.QueryAsync<TEntity>(String.Format(@"select * from {0} {1} limit @From,@PageRange", this.TableName, this.GetOrderSegment(fieldOrders)), new { From = from, PageRange = pageRange });
         }
 
         public TEntity FindOne(TID id)
@@ -356,6 +401,24 @@ namespace FewBox.Core.Persistence.Orm
         {
             int from = (pageIndex - 1) * pageRange;
             return this.UnitOfWork.Connection.Query<TEntity>(String.Format(@"select * from {0} where ModifiedBy=@ModifiedBy limit @From,@PageRange", this.TableName), new { From = from, PageRange = pageRange, ModifiedBy = modifiedBy });
+        }
+
+        private string GetOrderSegment(IEnumerable<string> fields, OrderType orderType)
+        {
+            StringBuilder orderSegment = new StringBuilder();
+            orderSegment.Append(" order by ");
+            orderSegment.Append(String.Join(",", fields));
+            orderSegment.AppendFormat(" {0}", orderType.ToString().ToLower());
+            return orderSegment.ToString();
+        }
+
+        private string GetOrderSegment(IDictionary<string, OrderType> fieldOrders)
+        {
+            StringBuilder orderSegment = new StringBuilder();
+            orderSegment.Append(" order by ");
+            var orders = fieldOrders.Keys.Select(k => { return $"{0} {1}"; });
+            orderSegment.Append(String.Join(",", orders));
+            return orderSegment.ToString();
         }
     }
 }

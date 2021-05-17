@@ -10,7 +10,7 @@
             "request": "launch",
             "preLaunchTask": "build",
             // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceFolder}/FewBox.Core.Persistence.UnitTest/bin/Debug/netcoreapp3.1/FewBox.Core.Persistence.UnitTest.dll",
+            "program": "${workspaceFolder}/FewBox.Core.Persistence.UnitTest/bin/Debug/netcoreapp5.0/FewBox.Core.Persistence.UnitTest.dll",
             "args": [],
             "cwd": "${workspaceFolder}/FewBox.Core.Persistence.UnitTest",
             // For more information about the 'console' field, see https://aka.ms/VSCode-CS-LaunchJson-Console
