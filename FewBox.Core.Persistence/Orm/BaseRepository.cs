@@ -88,12 +88,12 @@ namespace FewBox.Core.Persistence.Orm
             return this.UnitOfWork.Connection.Query<TEntity>(String.Format(@"select * from {0}", this.TableName));
         }
 
-        public IEnumerable<TEntity> FindAllOrderBy(IEnumerable<string> fields, OrderType orderType)
+        public IEnumerable<TEntity> FindAll(IEnumerable<string> fields, OrderType orderType)
         {
             return this.UnitOfWork.Connection.Query<TEntity>(String.Format(@"select * from {0} {1}", this.TableName, this.GetOrderSegment(fields, orderType)));
         }
 
-        public IEnumerable<TEntity> FindAllOrderBy(IDictionary<string, OrderType> fieldOrders)
+        public IEnumerable<TEntity> FindAll(IDictionary<string, OrderType> fieldOrders)
         {
             return this.UnitOfWork.Connection.Query<TEntity>(String.Format(@"select * from {0} {1}", this.TableName, this.GetOrderSegment(fieldOrders)));
         }
@@ -103,12 +103,12 @@ namespace FewBox.Core.Persistence.Orm
             return this.UnitOfWork.Connection.QueryAsync<TEntity>(String.Format(@"select * from {0}", this.TableName));
         }
 
-        public Task<IEnumerable<TEntity>> FindAllOrderByAsync(IEnumerable<string> fields, OrderType orderType)
+        public Task<IEnumerable<TEntity>> FindAllAsync(IEnumerable<string> fields, OrderType orderType)
         {
             return this.UnitOfWork.Connection.QueryAsync<TEntity>(String.Format(@"select * from {0} {1}", this.TableName, this.GetOrderSegment(fields, orderType)));
         }
 
-        public Task<IEnumerable<TEntity>> FindAllOrderByAsync(IDictionary<string, OrderType> fieldOrders)
+        public Task<IEnumerable<TEntity>> FindAllAsync(IDictionary<string, OrderType> fieldOrders)
         {
             return this.UnitOfWork.Connection.QueryAsync<TEntity>(String.Format(@"select * from {0} {1}", this.TableName, this.GetOrderSegment(fieldOrders)));
         }
@@ -119,13 +119,13 @@ namespace FewBox.Core.Persistence.Orm
             return this.UnitOfWork.Connection.Query<TEntity>(String.Format(@"select * from {0} limit @From,@PageRange", this.TableName), new { From = from, PageRange = pageRange });
         }
 
-        public IEnumerable<TEntity> FindAllOrderBy(int pageIndex, int pageRange, IEnumerable<string> fields, OrderType orderType)
+        public IEnumerable<TEntity> FindAll(int pageIndex, int pageRange, IEnumerable<string> fields, OrderType orderType)
         {
             int from = (pageIndex - 1) * pageRange;
             return this.UnitOfWork.Connection.Query<TEntity>(String.Format(@"select * from {0} {1} limit @From,@PageRange", this.TableName, this.GetOrderSegment(fields, orderType)), new { From = from, PageRange = pageRange });
         }
 
-        public IEnumerable<TEntity> FindAllOrderBy(int pageIndex, int pageRange, IDictionary<string, OrderType> fieldOrders)
+        public IEnumerable<TEntity> FindAll(int pageIndex, int pageRange, IDictionary<string, OrderType> fieldOrders)
         {
             int from = (pageIndex - 1) * pageRange;
             return this.UnitOfWork.Connection.Query<TEntity>(String.Format(@"select * from {0} {1} limit @From,@PageRange", this.TableName, this.GetOrderSegment(fieldOrders)), new { From = from, PageRange = pageRange });
@@ -137,13 +137,13 @@ namespace FewBox.Core.Persistence.Orm
             return this.UnitOfWork.Connection.QueryAsync<TEntity>(String.Format(@"select * from {0} limit @From,@PageRange", this.TableName), new { From = from, PageRange = pageRange });
         }
 
-        public Task<IEnumerable<TEntity>> FindAllOrderByAsync(int pageIndex, int pageRange, IEnumerable<string> fields, OrderType orderType)
+        public Task<IEnumerable<TEntity>> FindAllAsync(int pageIndex, int pageRange, IEnumerable<string> fields, OrderType orderType)
         {
             int from = (pageIndex - 1) * pageRange;
             return this.UnitOfWork.Connection.QueryAsync<TEntity>(String.Format(@"select * from {0} {1} limit @From,@PageRange", this.TableName, this.GetOrderSegment(fields, orderType)), new { From = from, PageRange = pageRange });
         }
 
-        public Task<IEnumerable<TEntity>> FindAllOrderByAsync(int pageIndex, int pageRange, IDictionary<string, OrderType> fieldOrders)
+        public Task<IEnumerable<TEntity>> FindAllAsync(int pageIndex, int pageRange, IDictionary<string, OrderType> fieldOrders)
         {
             int from = (pageIndex - 1) * pageRange;
             return this.UnitOfWork.Connection.QueryAsync<TEntity>(String.Format(@"select * from {0} {1} limit @From,@PageRange", this.TableName, this.GetOrderSegment(fieldOrders)), new { From = from, PageRange = pageRange });
@@ -355,9 +355,29 @@ namespace FewBox.Core.Persistence.Orm
             return this.UnitOfWork.Connection.QueryAsync<TEntity>(String.Format(@"select * from {0} where CreatedBy=@CreatedBy", this.TableName), new { CreatedBy = createdBy });
         }
 
+        public Task<IEnumerable<TEntity>> FindAllByCreatedByAsync(Guid createdBy, IEnumerable<string> fields, OrderType orderType)
+        {
+            return this.UnitOfWork.Connection.QueryAsync<TEntity>(String.Format(@"select * from {0} where CreatedBy=@CreatedBy {1}", this.TableName, this.GetOrderSegment(fields, orderType)), new { CreatedBy = createdBy });
+        }
+
+        public Task<IEnumerable<TEntity>> FindAllByCreatedByAsync(Guid createdBy, IDictionary<string, OrderType> fieldOrders)
+        {
+            return this.UnitOfWork.Connection.QueryAsync<TEntity>(String.Format(@"select * from {0} where CreatedBy=@CreatedBy {1}", this.TableName, this.GetOrderSegment(fieldOrders)), new { CreatedBy = createdBy });
+        }
+
         public Task<IEnumerable<TEntity>> FindAllByModifiedByAsync(Guid modifiedBy)
         {
             return this.UnitOfWork.Connection.QueryAsync<TEntity>(String.Format(@"select * from {0} where ModifiedBy=@ModifiedBy", this.TableName), new { ModifiedBy = modifiedBy });
+        }
+
+        public Task<IEnumerable<TEntity>> FindAllByModifiedByAsync(Guid modifiedBy, IEnumerable<string> fields, OrderType orderType)
+        {
+            return this.UnitOfWork.Connection.QueryAsync<TEntity>(String.Format(@"select * from {0} where ModifiedBy=@ModifiedBy {1}", this.TableName, this.GetOrderSegment(fields, orderType)), new { ModifiedBy = modifiedBy });
+        }
+
+        public Task<IEnumerable<TEntity>> FindAllByModifiedByAsync(Guid modifiedBy, IDictionary<string, OrderType> fieldOrders)
+        {
+            return this.UnitOfWork.Connection.QueryAsync<TEntity>(String.Format(@"select * from {0} where ModifiedBy=@ModifiedBy {1}", this.TableName, this.GetOrderSegment(fieldOrders)), new { ModifiedBy = modifiedBy });
         }
 
         public Task<IEnumerable<TEntity>> FindAllByCreatedByAsync(Guid createdBy, int pageIndex, int pageRange)
@@ -366,10 +386,34 @@ namespace FewBox.Core.Persistence.Orm
             return this.UnitOfWork.Connection.QueryAsync<TEntity>(String.Format(@"select * from {0} where CreatedBy=@CreatedBy limit @From,@PageRange", this.TableName), new { From = from, PageRange = pageRange, CreatedBy = createdBy });
         }
 
+        public Task<IEnumerable<TEntity>> FindAllByCreatedByAsync(Guid createdBy, int pageIndex, int pageRange, IEnumerable<string> fields, OrderType orderType)
+        {
+            int from = (pageIndex - 1) * pageRange;
+            return this.UnitOfWork.Connection.QueryAsync<TEntity>(String.Format(@"select * from {0} where CreatedBy=@CreatedBy {1} limit @From,@PageRange", this.TableName, this.GetOrderSegment(fields, orderType)), new { From = from, PageRange = pageRange, CreatedBy = createdBy });
+        }
+
+        public Task<IEnumerable<TEntity>> FindAllByCreatedByAsync(Guid createdBy, int pageIndex, int pageRange, IDictionary<string, OrderType> fieldOrders)
+        {
+            int from = (pageIndex - 1) * pageRange;
+            return this.UnitOfWork.Connection.QueryAsync<TEntity>(String.Format(@"select * from {0} where CreatedBy=@CreatedBy {1} limit @From,@PageRange", this.TableName, this.GetOrderSegment(fieldOrders)), new { From = from, PageRange = pageRange, CreatedBy = createdBy });
+        }
+
         public Task<IEnumerable<TEntity>> FindAllByModifiedByAsync(Guid modifiedBy, int pageIndex, int pageRange)
         {
             int from = (pageIndex - 1) * pageRange;
             return this.UnitOfWork.Connection.QueryAsync<TEntity>(String.Format(@"select * from {0} where ModifiedBy=@ModifiedBy limit @From,@PageRange", this.TableName), new { From = from, PageRange = pageRange, ModifiedBy = modifiedBy });
+        }
+
+        public Task<IEnumerable<TEntity>> FindAllByModifiedByAsync(Guid modifiedBy, int pageIndex, int pageRange, IEnumerable<string> fields, OrderType orderType)
+        {
+            int from = (pageIndex - 1) * pageRange;
+            return this.UnitOfWork.Connection.QueryAsync<TEntity>(String.Format(@"select * from {0} where ModifiedBy=@ModifiedBy {1} limit @From,@PageRange", this.TableName, this.GetOrderSegment(fields, orderType)), new { From = from, PageRange = pageRange, ModifiedBy = modifiedBy });
+        }
+
+        public Task<IEnumerable<TEntity>> FindAllByModifiedByAsync(Guid modifiedBy, int pageIndex, int pageRange, IDictionary<string, OrderType> fieldOrders)
+        {
+            int from = (pageIndex - 1) * pageRange;
+            return this.UnitOfWork.Connection.QueryAsync<TEntity>(String.Format(@"select * from {0} where ModifiedBy=@ModifiedBy {1} limit @From,@PageRange", this.TableName, this.GetOrderSegment(fieldOrders)), new { From = from, PageRange = pageRange, ModifiedBy = modifiedBy });
         }
 
         public int CountByCreatedBy(Guid createdBy)
@@ -387,20 +431,65 @@ namespace FewBox.Core.Persistence.Orm
             return this.UnitOfWork.Connection.Query<TEntity>(String.Format(@"select * from {0} where CreatedBy=@CreatedBy", this.TableName), new { CreatedBy = createdBy });
         }
 
+        public IEnumerable<TEntity> FindAllByCreatedBy(Guid createdBy, IEnumerable<string> fields, OrderType orderType)
+        {
+            return this.UnitOfWork.Connection.Query<TEntity>(String.Format(@"select * from {0} where CreatedBy=@CreatedBy {1}", this.TableName, this.GetOrderSegment(fields, orderType)), new { CreatedBy = createdBy });
+        }
+
+        public IEnumerable<TEntity> FindAllByCreatedBy(Guid createdBy, IDictionary<string, OrderType> fieldOrders)
+        {
+            return this.UnitOfWork.Connection.Query<TEntity>(String.Format(@"select * from {0} where CreatedBy=@CreatedBy {1}", this.TableName, this.GetOrderSegment(fieldOrders)), new { CreatedBy = createdBy });
+        }
+
         public IEnumerable<TEntity> FindAllByModifiedBy(Guid modifiedBy)
         {
             return this.UnitOfWork.Connection.Query<TEntity>(String.Format(@"select * from {0} where ModifiedBy=@ModifiedBy", this.TableName), new { ModifiedBy = modifiedBy });
         }
+
+        public IEnumerable<TEntity> FindAllByModifiedBy(Guid modifiedBy, IEnumerable<string> fields, OrderType orderType)
+        {
+            return this.UnitOfWork.Connection.Query<TEntity>(String.Format(@"select * from {0} where ModifiedBy=@ModifiedBy {1}", this.TableName, this.GetOrderSegment(fields, orderType)), new { ModifiedBy = modifiedBy });
+        }
+
+        public IEnumerable<TEntity> FindAllByModifiedBy(Guid modifiedBy, IDictionary<string, OrderType> fieldOrders)
+        {
+            return this.UnitOfWork.Connection.Query<TEntity>(String.Format(@"select * from {0} where ModifiedBy=@ModifiedBy {1}", this.TableName, this.GetOrderSegment(fieldOrders)), new { ModifiedBy = modifiedBy });
+        }
+
         public IEnumerable<TEntity> FindAllByCreatedBy(Guid createdBy, int pageIndex, int pageRange)
         {
             int from = (pageIndex - 1) * pageRange;
             return this.UnitOfWork.Connection.Query<TEntity>(String.Format(@"select * from {0} where CreatedBy=@CreatedBy limit @From,@PageRange", this.TableName), new { From = from, PageRange = pageRange, CreatedBy = createdBy });
         }
 
+        public IEnumerable<TEntity> FindAllByCreatedBy(Guid createdBy, int pageIndex, int pageRange, IEnumerable<string> fields, OrderType orderType)
+        {
+            int from = (pageIndex - 1) * pageRange;
+            return this.UnitOfWork.Connection.Query<TEntity>(String.Format(@"select * from {0} where CreatedBy=@CreatedBy {1} limit @From,@PageRange", this.TableName, this.GetOrderSegment(fields, orderType)), new { From = from, PageRange = pageRange, CreatedBy = createdBy });
+        }
+
+        public IEnumerable<TEntity> FindAllByCreatedBy(Guid createdBy, int pageIndex, int pageRange, IDictionary<string, OrderType> fieldOrders)
+        {
+            int from = (pageIndex - 1) * pageRange;
+            return this.UnitOfWork.Connection.Query<TEntity>(String.Format(@"select * from {0} where CreatedBy=@CreatedBy {1} limit @From,@PageRange", this.TableName, this.GetOrderSegment(fieldOrders)), new { From = from, PageRange = pageRange, CreatedBy = createdBy });
+        }
+
         public IEnumerable<TEntity> FindAllByModifiedBy(Guid modifiedBy, int pageIndex, int pageRange)
         {
             int from = (pageIndex - 1) * pageRange;
             return this.UnitOfWork.Connection.Query<TEntity>(String.Format(@"select * from {0} where ModifiedBy=@ModifiedBy limit @From,@PageRange", this.TableName), new { From = from, PageRange = pageRange, ModifiedBy = modifiedBy });
+        }
+
+        public IEnumerable<TEntity> FindAllByModifiedBy(Guid modifiedBy, int pageIndex, int pageRange, IEnumerable<string> fields, OrderType orderType)
+        {
+            int from = (pageIndex - 1) * pageRange;
+            return this.UnitOfWork.Connection.Query<TEntity>(String.Format(@"select * from {0} where ModifiedBy=@ModifiedBy {1} limit @From,@PageRange", this.TableName, this.GetOrderSegment(fields, orderType)), new { From = from, PageRange = pageRange, ModifiedBy = modifiedBy });
+        }
+
+        public IEnumerable<TEntity> FindAllByModifiedBy(Guid modifiedBy, int pageIndex, int pageRange, IDictionary<string, OrderType> fieldOrders)
+        {
+            int from = (pageIndex - 1) * pageRange;
+            return this.UnitOfWork.Connection.Query<TEntity>(String.Format(@"select * from {0} where ModifiedBy=@ModifiedBy {1} limit @From,@PageRange", this.TableName, this.GetOrderSegment(fieldOrders)), new { From = from, PageRange = pageRange, ModifiedBy = modifiedBy });
         }
 
         private string GetOrderSegment(IEnumerable<string> fields, OrderType orderType)

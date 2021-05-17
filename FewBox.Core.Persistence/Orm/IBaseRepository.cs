@@ -10,11 +10,11 @@ namespace FewBox.Core.Persistence.Orm
 
         Task<int> CountAsync();
         Task<IEnumerable<TEntity>> FindAllAsync();
-        Task<IEnumerable<TEntity>> FindAllOrderByAsync(IEnumerable<string> fields, OrderType orderType);
-        Task<IEnumerable<TEntity>> FindAllOrderByAsync(IDictionary<string, OrderType> fieldOrders);
+        Task<IEnumerable<TEntity>> FindAllAsync(IEnumerable<string> fields, OrderType orderType);
+        Task<IEnumerable<TEntity>> FindAllAsync(IDictionary<string, OrderType> fieldOrders);
         Task<IEnumerable<TEntity>> FindAllAsync(int pageIndex, int pageRange);
-        Task<IEnumerable<TEntity>> FindAllOrderByAsync(int pageIndex, int pageRange, IEnumerable<string> fields, OrderType orderType);
-        Task<IEnumerable<TEntity>> FindAllOrderByAsync(int pageIndex, int pageRange, IDictionary<string, OrderType> fieldOrders);
+        Task<IEnumerable<TEntity>> FindAllAsync(int pageIndex, int pageRange, IEnumerable<string> fields, OrderType orderType);
+        Task<IEnumerable<TEntity>> FindAllAsync(int pageIndex, int pageRange, IDictionary<string, OrderType> fieldOrders);
         Task<TEntity> FindOneAsync(TID id);
         Task<int> SaveAsync(TEntity entity);
         Task<int> ReplaceAsync(TEntity entity);
@@ -29,9 +29,17 @@ namespace FewBox.Core.Persistence.Orm
         Task<int> CountByCreatedByAsync(Guid createdBy);
         Task<int> CountByModifiedByAsync(Guid modifiedBy);
         Task<IEnumerable<TEntity>> FindAllByCreatedByAsync(Guid createdBy);
+        Task<IEnumerable<TEntity>> FindAllByCreatedByAsync(Guid createdBy, IEnumerable<string> fields, OrderType orderType);
+        Task<IEnumerable<TEntity>> FindAllByCreatedByAsync(Guid createdBy, IDictionary<string, OrderType> fieldOrders);
         Task<IEnumerable<TEntity>> FindAllByModifiedByAsync(Guid modifiedBy);
+        Task<IEnumerable<TEntity>> FindAllByModifiedByAsync(Guid modifiedBy, IEnumerable<string> fields, OrderType orderType);
+        Task<IEnumerable<TEntity>> FindAllByModifiedByAsync(Guid modifiedBy, IDictionary<string, OrderType> fieldOrders);
         Task<IEnumerable<TEntity>> FindAllByCreatedByAsync(Guid createdBy, int pageIndex, int pageRange);
+        Task<IEnumerable<TEntity>> FindAllByCreatedByAsync(Guid createdBy, int pageIndex, int pageRange, IEnumerable<string> fields, OrderType orderType);
+        Task<IEnumerable<TEntity>> FindAllByCreatedByAsync(Guid createdBy, int pageIndex, int pageRange, IDictionary<string, OrderType> fieldOrders);
         Task<IEnumerable<TEntity>> FindAllByModifiedByAsync(Guid modifiedBy, int pageIndex, int pageRange);
+        Task<IEnumerable<TEntity>> FindAllByModifiedByAsync(Guid modifiedBy, int pageIndex, int pageRange, IEnumerable<string> fields, OrderType orderType);
+        Task<IEnumerable<TEntity>> FindAllByModifiedByAsync(Guid modifiedBy, int pageIndex, int pageRange, IDictionary<string, OrderType> fieldOrders);
 
         #endregion
 
@@ -39,11 +47,11 @@ namespace FewBox.Core.Persistence.Orm
 
         int Count();
         IEnumerable<TEntity> FindAll();
-        IEnumerable<TEntity> FindAllOrderBy(IEnumerable<string> fields, OrderType orderType);
-        IEnumerable<TEntity> FindAllOrderBy(IDictionary<string, OrderType> fieldOrders);
+        IEnumerable<TEntity> FindAll(IEnumerable<string> fields, OrderType orderType);
+        IEnumerable<TEntity> FindAll(IDictionary<string, OrderType> fieldOrders);
         IEnumerable<TEntity> FindAll(int pageIndex, int pageRange);
-        IEnumerable<TEntity> FindAllOrderBy(int pageIndex, int pageRange, IEnumerable<string> fields, OrderType orderType);
-        IEnumerable<TEntity> FindAllOrderBy(int pageIndex, int pageRange, IDictionary<string, OrderType> fieldOrders);
+        IEnumerable<TEntity> FindAll(int pageIndex, int pageRange, IEnumerable<string> fields, OrderType orderType);
+        IEnumerable<TEntity> FindAll(int pageIndex, int pageRange, IDictionary<string, OrderType> fieldOrders);
         TEntity FindOne(TID id);
         TID Save(TEntity entity);
         int Replace(TEntity entity);
@@ -58,9 +66,17 @@ namespace FewBox.Core.Persistence.Orm
         int CountByCreatedBy(Guid createdBy);
         int CountByModifiedBy(Guid modifiedBy);
         IEnumerable<TEntity> FindAllByCreatedBy(Guid createdBy);
+        IEnumerable<TEntity> FindAllByCreatedBy(Guid createdBy, IEnumerable<string> fields, OrderType orderType);
+        IEnumerable<TEntity> FindAllByCreatedBy(Guid createdBy, IDictionary<string, OrderType> fieldOrders);
         IEnumerable<TEntity> FindAllByModifiedBy(Guid modifiedBy);
+        IEnumerable<TEntity> FindAllByModifiedBy(Guid modifiedBy, IEnumerable<string> fields, OrderType orderType);
+        IEnumerable<TEntity> FindAllByModifiedBy(Guid modifiedBy, IDictionary<string, OrderType> fieldOrders);
         IEnumerable<TEntity> FindAllByCreatedBy(Guid createdBy, int pageIndex, int pageRange);
+        IEnumerable<TEntity> FindAllByCreatedBy(Guid createdBy, int pageIndex, int pageRange, IEnumerable<string> fields, OrderType orderType);
+        IEnumerable<TEntity> FindAllByCreatedBy(Guid createdBy, int pageIndex, int pageRange, IDictionary<string, OrderType> fieldOrders);
         IEnumerable<TEntity> FindAllByModifiedBy(Guid modifiedBy, int pageIndex, int pageRange);
+        IEnumerable<TEntity> FindAllByModifiedBy(Guid modifiedBy, int pageIndex, int pageRange, IEnumerable<string> fields, OrderType orderType);
+        IEnumerable<TEntity> FindAllByModifiedBy(Guid modifiedBy, int pageIndex, int pageRange, IDictionary<string, OrderType> fieldOrders);
         #endregion
     }
 }
