@@ -73,6 +73,8 @@ namespace FewBox.Core.Persistence.UnitTest
                 Assert.IsTrue(apps.AsList().Count == 2);
                 Assert.AreEqual("FewBox", apps.AsList()[1].Name);
                 Assert.AreEqual(Guid.Empty, apps.AsList()[1].Char36Id);
+                // Verify FindAll CreatedBy
+                var createdByApps = appRespository.FindAllByCreatedBy(Guid.Empty, 1, 1 );
                 // Verify Count
                 int count = appRespository.Count();
                 Assert.IsTrue(count == 2);
